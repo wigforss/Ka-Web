@@ -1,0 +1,52 @@
+package org.kasource.web.websocket;
+
+import java.io.IOException;
+
+
+/**
+ * Web Socket Message Sender.
+ * 
+ * Allows messages to be sent to Web Socket clients.
+ * 
+ * @author rikardwi
+ **/
+public interface WebsocketMessageSender  {
+
+    /**
+     * Broadcasts a text message to all clients.
+     * 
+     * @param message Message to send.
+     **/
+    public void broadcast(String message);
+    
+    /**
+     * Broadcasts a binary message to all clients.
+     * 
+     * @param message Message to send.
+     **/
+    public void broadcastBinary(byte[] message);
+    
+    /**
+     * Sends a text message to a specific client.
+     * 
+     * @param message Message to send.
+     * @param clientId ID of the client to receive the message.
+     * 
+     * @throws IOException if message could not be sent.
+     * @throws NoSuchWebSocketClient if there is no connected client with the supplied clientId.
+     **/
+    public void sendMessage(String clientId, String message) throws IOException, NoSuchWebSocketClient; 
+    
+    /**
+     * Sends a binary message to a specific client.
+     * 
+     * @param message Message to send.
+     * @param clientId ID of the client to receive the message.
+     * 
+     * @throws IOException if message could not be sent.
+     * @throws NoSuchWebSocketClient if there is no connected client with the supplied clientId.
+     **/
+    public void sendBinaryMessage(String clientId, byte[] message) throws IOException, NoSuchWebSocketClient; 
+    
+    
+}
