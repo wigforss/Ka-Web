@@ -11,6 +11,7 @@
 	<artifactId>ka-spring-websocket</artifactId>
 	<packaging>jar</packaging>
 	<name>Ka Spring Web Socket</name>
+	<description>Ka Websocket for Spring</description>
 	<url>http://maven.apache.org</url>
 
 	<build>

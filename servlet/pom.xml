@@ -11,6 +11,7 @@
 	<artifactId>ka-servlet</artifactId>
 	<packaging>jar</packaging>
 	<name>Ka Servlet Utils</name>
+	<description>Ka Servlet utilities and tools</description>
 	<url>http://maven.apache.org</url>
 	
 	<build>

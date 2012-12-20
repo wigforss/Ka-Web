@@ -11,6 +11,7 @@
 	<artifactId>ka-websocket</artifactId>
 	<packaging>jar</packaging>
 	<name>Ka Web Socket</name>
+	<description>Ka Websocket Framework</description>
 	<url>http://maven.apache.org</url>
 	
 	<repositories>
