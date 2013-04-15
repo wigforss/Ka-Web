@@ -1,0 +1,75 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<parent>
+        <groupId>org.kasource.websocket</groupId>
+        <artifactId>ka-websocket</artifactId>
+        <version>0.2-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+	<groupId>org.kasource.websocket</groupId>
+	<artifactId>ka-websocket-core</artifactId>
+	<packaging>jar</packaging>
+	<name>Ka Web Socket Core</name>
+	<description>Ka Websocket Framework Core</description>
+	<url>http://maven.apache.org</url>
+	
+	
+	<build>
+		<plugins>
+			
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-eclipse-plugin</artifactId>
+				</plugin>
+                     		
+		</plugins>
+	</build>
+	<reporting>
+		<plugins>	
+		</plugins>
+	</reporting>
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+		</dependency>
+	<dependency>
+		<groupId>commons-codec</groupId>
+		<artifactId>commons-codec</artifactId>
+	</dependency>
+            
+	<dependency>
+		<groupId>org.slf4j</groupId>
+		<artifactId>slf4j-api</artifactId>
+	</dependency>
+	<dependency>
+		<groupId>org.codehaus.jackson</groupId>
+		<artifactId>jackson-mapper-asl</artifactId>
+	</dependency>
+	<dependency>
+	   <groupId>org.apache.tomcat</groupId>
+	   <artifactId>tomcat-catalina</artifactId>
+    </dependency>   
+   <dependency>
+        <groupId>org.apache.tomcat</groupId>
+        <artifactId>tomcat-coyote</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-websocket</artifactId>
+    </dependency> 
+   <dependency>
+		<groupId>com.sun.grizzly</groupId>
+		<artifactId>grizzly-websockets</artifactId>
+	</dependency>
+    <dependency>
+        <groupId>com.caucho</groupId>
+        <artifactId>resin</artifactId>
+    </dependency>	
+	</dependencies>
+
+</project>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="http://java.sun.com/xml/ns/javaee"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+    version="3.0"
+>
+	<display-name>Ka Web Socket Guice Example</display-name>
+	
+	<listener>
+		<listener-class>org.kasource.web.websocket.channel.WebSocketChannelFactoryImpl</listener-class>
+	</listener>
+	<listener>
+  		<listener-class>org.kasource.web.websocket.guice.example.web.ExampleServletConfig</listener-class>
+	</listener>
+
+ 
+  <servlet>
+    <servlet-name>chat</servlet-name>
+    <servlet-class>org.kasource.web.websocket.impl.tomcat.TomcatWebsocketImpl</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>chat</servlet-name>
+    <url-pattern>/chat</url-pattern>
+  </servlet-mapping>
+
+    
+</web-app>

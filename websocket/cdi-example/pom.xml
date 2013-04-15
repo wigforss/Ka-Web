@@ -1,0 +1,121 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<parent>
+        <groupId>org.kasource.websocket</groupId>
+        <artifactId>ka-websocket</artifactId>
+        <version>0.2-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+	<artifactId>ka-cdi-websocket-example</artifactId>
+	<packaging>war</packaging>
+	<name>Ka CDI Web Socket Example</name>
+	<description>Ka Websocket Example for CDI</description>
+	<url>http://maven.apache.org</url>
+	<repositories>
+        <repository>
+            <id>release-repository.java.net</id>
+            <name>Java.net Release Repository for Maven</name>
+            <url>https://maven.java.net/content/repositories/releases/</url>
+            <layout>default</layout>
+        </repository>
+    </repositories>
+	<build>
+		<plugins>
+			<plugin>
+    			<groupId>org.glassfish.embedded</groupId>
+				<artifactId>maven-embedded-glassfish-plugin</artifactId>
+				<version>3.1.2</version>
+    			<configuration>
+       				<goalPrefix>embedded-glassfish</goalPrefix>
+       				<app>target/ka-cdi-websocket-example-${project.version}</app>
+       				<autoDelete>true</autoDelete>
+       				<port>8080</port>
+       				<contextRoot>/chat-example</contextRoot>
+       				<commands>
+       					<command>
+       						asadmin set configs.config.server-config.network-config.protocols.protocol.http-listener-1.http.websockets-support-enabled=true
+       					</command>
+       				</commands>
+    			</configuration> 
+    		</plugin>
+    		<plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>2.1.1</version>
+            </plugin>
+    		 <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>1.4</version>
+                <executions>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/main/webapp</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin> 		
+		</plugins>
+	</build>
+	<reporting>
+		<plugins>	
+		</plugins>
+	</reporting>
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>${junit.version}</version>
+            <scope>test</scope>
+		</dependency>
+	<dependency>
+    	<groupId>org.slf4j</groupId>
+    	<artifactId>slf4j-log4j12</artifactId>
+	</dependency> 
+
+	<dependency>
+    	<groupId>log4j</groupId>
+    	<artifactId>log4j</artifactId>
+	</dependency>		
+	<dependency>
+		<groupId>org.slf4j</groupId>
+		<artifactId>jul-to-slf4j</artifactId>			
+	</dependency>
+	<dependency>
+		<groupId>org.glassfish.main.common</groupId>
+		<artifactId>simple-glassfish-api</artifactId>
+		<version>3.1.2</version>
+		<scope>provided</scope>
+	</dependency>
+	
+	  <dependency>
+			<groupId>org.kasource.websocket</groupId>
+			<artifactId>ka-websocket-core</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+    <dependency>
+    	<groupId>org.kasource</groupId>
+		<artifactId>ka-cdi-websocket</artifactId>
+		<version>${project.version}</version>
+    </dependency>
+ 	<dependency>
+		<groupId>javax</groupId>
+		<artifactId>javaee-api</artifactId>
+	</dependency>
+	
+	<dependency>
+		<groupId>com.sun.grizzly</groupId>
+		<artifactId>grizzly-websockets</artifactId>
+		<version>1.9.56</version>
+	</dependency>
+	
+	</dependencies>
+
+</project>
