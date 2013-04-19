@@ -6,6 +6,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 
+import org.kasource.web.websocket.RecipientType;
 import org.kasource.web.websocket.annotations.OnWebSocketEvent;
 import org.kasource.web.websocket.annotations.OnWebSocketMessage;
 import org.kasource.web.websocket.annotations.WebSocketListener;
@@ -20,7 +21,7 @@ import org.kasource.web.websocket.event.WebSocketClientConnectionEvent;
 import org.kasource.web.websocket.event.WebSocketClientDisconnectedEvent;
 import org.kasource.web.websocket.event.WebSocketClientEvent;
 import org.kasource.web.websocket.event.WebSocketTextMessageEvent;
-import org.kasource.web.websocket.event.WebSocketTextProtocolMessageEvent;
+import org.kasource.web.websocket.event.WebSocketTextObjectMessageEvent;
 import org.kasource.web.websocket.protocol.JsonProtocolHandler;
 import org.kasource.web.websocket.protocol.XmlProtocolHandler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,7 @@ public class ChatController {
     private WebSocketChannelFactory channelFactory;
     
     @OnWebSocketEvent
-    public void recieveMessage(WebSocketTextProtocolMessageEvent event) {
+    public void recieveMessage(WebSocketTextObjectMessageEvent event) {
         WebSocketChannel socket = event.getSource();
         Message message = event.getMessageAsObject(Message.class);
         message.setBody(event.getClientId() + " says: " + message.getBody());
@@ -46,8 +47,8 @@ public class ChatController {
     public void onClientConnect(WebSocketClientConnectionEvent event) throws NoSuchWebSocketClient, IOException {
         WebSocketChannel socket = event.getSource();
         Message message = new Message();
-        message.setBody("Welcome " + event.getClientId());
-        socket.sendMessageAsXml(event.getClientId(), message);
+        message.setBody("Welcome " + event.getUsername());
+        socket.sendMessageAsXml(message, event.getClientId(), RecipientType.CLIENT_ID);
         message.setBody(event.getClientId() + " joined the conversation.");
         socket.broadcastXmlMessage(event.getClientId() + " joined the conversation.");
     }
@@ -56,7 +57,7 @@ public class ChatController {
     public void onClientDisconnect(WebSocketClientDisconnectedEvent event) {
         WebSocketChannel socket = event.getSource();
         Message message = new Message();
-        message.setBody(event.getClientId() + " left the conversation.");
+        message.setBody(event.getUsername() + " left the conversation.");
        socket.broadcastXmlMessage(message);
     }
     

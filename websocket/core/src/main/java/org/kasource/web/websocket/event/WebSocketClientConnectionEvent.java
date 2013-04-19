@@ -1,8 +1,7 @@
 package org.kasource.web.websocket.event;
 
-import java.util.Map;
-
 import org.kasource.web.websocket.channel.WebSocketChannel;
+import org.kasource.web.websocket.impl.WebSocketClient;
 
 /**
  * Event emitted when a client has connected to a web socket.
@@ -12,8 +11,7 @@ import org.kasource.web.websocket.channel.WebSocketChannel;
 public class WebSocketClientConnectionEvent extends WebSocketClientEvent {
     private static final long serialVersionUID = 1L;
     
-    private final Map<String, String[]> connectionParameters;
-   
+
     /**
      * Constructor.
      * 
@@ -22,21 +20,12 @@ public class WebSocketClientConnectionEvent extends WebSocketClientEvent {
      * @param connectionParameters  The connection parameters
      **/
     public WebSocketClientConnectionEvent(WebSocketChannel websocket, 
-                                          String clientId, 
-                                          Map<String, String[]> connectionParameters) {
-        super(websocket, clientId);
-        this.connectionParameters = connectionParameters;
+                                          WebSocketClient client) {
+        super(websocket, client);
+        
     }
 
-    /**
-     * Returns the connectionParameters.
-     * 
-     * @return the connectionParameters
-     */
-    public Map<String, String[]> getConnectionParameters() {
-        return connectionParameters;
-    }
-
+   
     
    
 

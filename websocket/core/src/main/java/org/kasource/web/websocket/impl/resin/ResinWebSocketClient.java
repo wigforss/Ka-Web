@@ -8,6 +8,7 @@ import java.io.Reader;
 import java.util.Map;
 
 import org.kasource.web.websocket.impl.WebSocketClient;
+import org.kasource.web.websocket.manager.WebSocketManager;
 import org.kasource.web.websocket.protocol.ProtocolHandler;
 import org.kasource.web.websocket.util.IoUtils;
 
@@ -15,8 +16,8 @@ import com.caucho.websocket.WebSocketContext;
 import com.caucho.websocket.WebSocketListener;
 
 public class ResinWebSocketClient implements WebSocketListener, WebSocketClient  {
-
-    private ResinWebSocketManager manager;
+    private String username;
+    private WebSocketManager manager;
     private String id;
     private WebSocketContext context;
     private Map<String, String[]> connectionParameters;
@@ -24,7 +25,8 @@ public class ResinWebSocketClient implements WebSocketListener, WebSocketClient 
     private ProtocolHandler<String> textProtocol;
     private ProtocolHandler<byte[]> binaryProtocol;
     
-    public ResinWebSocketClient(ResinWebSocketManager manager, String clientId, Map<String, String[]> connectionParameters) {
+    public ResinWebSocketClient(WebSocketManager manager, String username, String clientId, Map<String, String[]> connectionParameters) {
+        this.username = username;
         this.id = clientId;
         this.manager = manager;
         this.connectionParameters = connectionParameters;
@@ -41,14 +43,14 @@ public class ResinWebSocketClient implements WebSocketListener, WebSocketClient 
 
     @Override
     public void onDisconnect(WebSocketContext context) throws IOException {
-        manager.unregisterClient(id);
+        manager.unregisterClient(this);
     }
 
 
 
     @Override
     public void onReadBinary(WebSocketContext context, InputStream in) throws IOException {
-        manager.onWebSocketMessage(ioUtils.toByteArray(in), binaryProtocol, id);
+        manager.onWebSocketMessage(this, ioUtils.toByteArray(in), binaryProtocol);
        
 
     }
@@ -57,7 +59,7 @@ public class ResinWebSocketClient implements WebSocketListener, WebSocketClient 
 
     @Override
     public void onReadText(WebSocketContext context, Reader reader) throws IOException {
-        manager.onWebSocketMessage(ioUtils.readString(reader), textProtocol, id);
+        manager.onWebSocketMessage(this, ioUtils.readString(reader), textProtocol);
 
     }
 
@@ -66,7 +68,7 @@ public class ResinWebSocketClient implements WebSocketListener, WebSocketClient 
     @Override
     public void onStart(WebSocketContext context) throws IOException {
         this.context = context;
-        manager.registerClient(id, this, connectionParameters);
+        manager.registerClient(this);
     }
 
 
@@ -128,6 +130,34 @@ public class ResinWebSocketClient implements WebSocketListener, WebSocketClient 
      */
     public void setBinaryProtocol(ProtocolHandler<byte[]> binaryProtocol) {
         this.binaryProtocol = binaryProtocol;
+    }
+
+    /**
+     * @return the username
+     */
+    @Override
+    public String getUsername() {
+        return username;
+    }
+
+
+
+    /**
+     * @return the connectionParameters
+     */
+    @Override
+    public Map<String, String[]> getConnectionParameters() {
+        return connectionParameters;
+    }
+
+
+
+    /**
+     * @return the id
+     */
+    @Override
+    public String getId() {
+        return id;
     }
 
 

@@ -1,25 +1,21 @@
 package org.kasource.web.websocket.impl.jetty;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.eclipse.jetty.websocket.WebSocket;
 import org.eclipse.jetty.websocket.WebSocketServlet;
 import org.kasource.web.websocket.manager.WebSocketManager;
-import org.kasource.web.websocket.manager.WebSocketManagerRepository;
 import org.kasource.web.websocket.util.ServletWebSocketConfig;
 
 
-public class JettyWebSocketImpl extends WebSocketServlet implements WebSocketManagerRepository {
+public class JettyWebSocketImpl extends WebSocketServlet {
    
     private static final long serialVersionUID = 1L;
   
     private ServletWebSocketConfig config; 
    
-    private Map<String, JettyWebSocketManager> managers = new ConcurrentHashMap<String, JettyWebSocketManager>();
+   
     
     
     @Override
@@ -28,7 +24,7 @@ public class JettyWebSocketImpl extends WebSocketServlet implements WebSocketMan
         config = new ServletWebSocketConfig(getServletConfig());
         config.validateMapping();
         if(!config.isDynamicAddressing()) {
-            getWebSocketManager(config.getMaping());
+            config.getManagerRepository().getWebSocketManager(config.getMaping());
         }
         
     }
@@ -37,7 +33,7 @@ public class JettyWebSocketImpl extends WebSocketServlet implements WebSocketMan
     
     @Override
     public WebSocket doWebSocketConnect(HttpServletRequest request, String protocol) {
-       
+      
         // Only accept protocols configured
         if(protocol != null && !protocol.isEmpty() && !config.getProtocolHandlerFactory().hasProtocol(protocol)) {
             return null;
@@ -47,11 +43,12 @@ public class JettyWebSocketImpl extends WebSocketServlet implements WebSocketMan
         if(config.isDynamicAddressing()) {
             managerName = request.getRequestURI().substring(request.getContextPath().length());
         }
-        JettyWebSocketManager manager = (JettyWebSocketManager) getWebSocketManager(managerName);
+        WebSocketManager manager =  config.getManagerRepository().getWebSocketManager(managerName);
+        String username = manager.authenticate(request);
         String clientId = config.getIdGeneator().getId(request, manager);
         
          
-        JettyWebSocketClient client = new JettyWebSocketClient(manager, clientId, request.getParameterMap());
+        JettyWebSocketClient client = new JettyWebSocketClient(manager, username, clientId, request.getParameterMap());
         client.setBinaryProtocol(config.getProtocolHandlerFactory().getBinaryProtocol(protocol, true));
         client.setTextProtocol(config.getProtocolHandlerFactory().getTextProtocol(protocol, true));
         return client;
@@ -82,17 +79,5 @@ public class JettyWebSocketImpl extends WebSocketServlet implements WebSocketMan
         return true;
     }
 
-    
-
-    
-    @Override
-    public WebSocketManager getWebSocketManager(String socketName) {
-        if (!managers.containsKey(socketName)) {
-            JettyWebSocketManager manager = new JettyWebSocketManager();
-            managers.put(socketName, manager);
-            getServletContext().setAttribute(ServletWebSocketConfig.ATTRIBUTE_PREFIX + socketName, manager);
-            return manager;
-        }
-        return managers.get(socketName);
-    }
+   
 }

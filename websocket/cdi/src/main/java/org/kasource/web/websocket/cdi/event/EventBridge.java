@@ -73,9 +73,9 @@ public class EventBridge implements WebSocketEventListener, WebSocketListenerReg
     public void onSendTextMessage(@Observes SendWebSocketTextMessageEvent event) {
         WebSocketChannel webSocket = event.getSource();
         try {
-            webSocket.sendMessage(event.getClientId(), event.getMessage());
+            webSocket.sendMessage(event.getMessage(), event.getRecipient(), event.getRecipientType());
         } catch (Exception e) {
-           LOG.warn("Could not send message: " +  event.getMessage() + " to: " + event.getClientId());
+           LOG.warn("Could not send message: " +  event.getMessage() + " to " +event.getRecipientType() + ": " + event.getRecipient());
         } 
     }
     
@@ -88,9 +88,9 @@ public class EventBridge implements WebSocketEventListener, WebSocketListenerReg
     public void onSendTextMessage(@Observes SendObjectAsWebSocketTextMessageEvent event) {
         WebSocketChannel webSocket = event.getSource();
         try {
-            webSocket.sendMessage(event.getClientId(), event.getMessage(), event.getProtocolHandler());
+            webSocket.sendMessage(event.getMessage(), event.getProtocolHandler(), event.getRecipient(), event.getRecipientType());
         } catch (Exception e) {
-           LOG.warn("Could not send message: " +  event.getMessage() + " to: " + event.getClientId());
+           LOG.warn("Could not send message: " +  event.getMessage() + " to " +event.getRecipientType() + ": " + event.getRecipient());
         } 
     }
     
@@ -103,9 +103,9 @@ public class EventBridge implements WebSocketEventListener, WebSocketListenerReg
     public void onSendBinaryMessage(@Observes SendWebSocketBinaryMessageEvent event) {
         WebSocketChannel webSocket = event.getSource();
         try {
-            webSocket.sendBinaryMessage(event.getClientId(), event.getMessage());
+            webSocket.sendBinaryMessage(event.getMessage(), event.getRecipient(), event.getRecipientType());
         } catch (Exception e) {
-           LOG.warn("Could not send message: " +  event.getMessage() + " to: " + event.getClientId());
+           LOG.warn("Could not send message: " +  event.getMessage() + " to " +event.getRecipientType() + ": " + event.getRecipient());
         } 
     }
     
@@ -118,9 +118,9 @@ public class EventBridge implements WebSocketEventListener, WebSocketListenerReg
     public void onSendBinaryProtocolMessage(@Observes SendObjectAsWebSocketBinaryMessageEvent event) throws IOException {
         WebSocketChannel webSocket = event.getSource();
        try {
-            webSocket.sendBinaryMessage(event.getClientId(), event.getMessage(), event.getProtocolHandler());
+            webSocket.sendBinaryMessage(event.getMessage(), event.getProtocolHandler(), event.getRecipient(), event.getRecipientType());
         } catch (Exception e) {
-           LOG.warn("Could not send message: " +  event.getMessage() + " to: " + event.getClientId());
+           LOG.warn("Could not send message: " +  event.getMessage() + " to " +event.getRecipientType() + ": " + event.getRecipient());
         } 
     }
     

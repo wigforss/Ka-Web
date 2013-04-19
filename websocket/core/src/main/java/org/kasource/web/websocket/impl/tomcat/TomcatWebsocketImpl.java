@@ -4,8 +4,6 @@ package org.kasource.web.websocket.impl.tomcat;
 
 
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -13,17 +11,18 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.catalina.websocket.StreamInbound;
 import org.apache.catalina.websocket.WebSocketServlet;
 import org.kasource.web.websocket.manager.WebSocketManager;
-import org.kasource.web.websocket.manager.WebSocketManagerRepository;
 import org.kasource.web.websocket.protocol.ProtocolHandlerFactory;
 import org.kasource.web.websocket.util.ServletWebSocketConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
 
-public class TomcatWebsocketImpl extends WebSocketServlet implements WebSocketManagerRepository {
+public class TomcatWebsocketImpl extends WebSocketServlet {
     private static final long serialVersionUID = 1L;
-
-    private Map<String, TomcatWebSocketManager> managers = new ConcurrentHashMap<String, TomcatWebSocketManager>();
+    private static final Logger LOG = LoggerFactory.getLogger(TomcatWebsocketImpl.class);
+   
     private ServletWebSocketConfig config; 
    
     private int outboundByteBufferSize;
@@ -35,13 +34,14 @@ public class TomcatWebsocketImpl extends WebSocketServlet implements WebSocketMa
     public void init() throws ServletException {
         super.init();
         config = new ServletWebSocketConfig(getServletConfig());
-        
+      
         outboundByteBufferSize = config.parseInitParamAsInt("outboundByteBufferSize");
         outboundCharBufferSize = config.parseInitParamAsInt("outboundCharBufferSize");
        
         config.validateMapping();
         if(!config.isDynamicAddressing()) {
-            getWebSocketManager(config.getMaping());
+            config.getManagerRepository().getWebSocketManager(config.getMaping());
+           
         } 
     }
 
@@ -56,11 +56,13 @@ public class TomcatWebsocketImpl extends WebSocketServlet implements WebSocketMa
             managerName = request.getRequestURI().substring(request.getContextPath().length());
         }
        
-        TomcatWebSocketManager manager = (TomcatWebSocketManager) getWebSocketManager(managerName);
+        WebSocketManager manager =   config.getManagerRepository().getWebSocketManager(managerName);
         
+        String username = manager.authenticate(request);
+     
         
         String id = config.getIdGeneator().getId(request, manager);
-        TomcatWebSocketClient client = new TomcatWebSocketClient(manager, id, request.getParameterMap());
+        TomcatWebSocketClient client = new TomcatWebSocketClient(manager, username, id, request.getParameterMap());
         ProtocolHandlerFactory protocols = config.getProtocolHandlerFactory();
         client.setBinaryProtocol(protocols.getBinaryProtocol(subProtocol, true));
         client.setTextProtocol(protocols.getTextProtocol(subProtocol, true));
@@ -76,18 +78,7 @@ public class TomcatWebsocketImpl extends WebSocketServlet implements WebSocketMa
     }
     
     
-    @Override
-    public WebSocketManager getWebSocketManager(String socketName) {
-        if (!managers.containsKey(socketName)) {
-            TomcatWebSocketManager manager = new TomcatWebSocketManager();
-            managers.put(socketName, manager);
-            getServletContext().setAttribute(ServletWebSocketConfig.ATTRIBUTE_PREFIX + socketName, manager);
-            return manager;
-        }
-        return managers.get(socketName);
-    }
    
-
 
     /**
      * Intended to be overridden by sub-classes that wish to verify the origin

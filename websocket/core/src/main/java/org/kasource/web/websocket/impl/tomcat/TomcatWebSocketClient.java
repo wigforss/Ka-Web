@@ -11,6 +11,7 @@ import java.util.Map;
 import org.apache.catalina.websocket.StreamInbound;
 import org.apache.catalina.websocket.WsOutbound;
 import org.kasource.web.websocket.impl.WebSocketClient;
+import org.kasource.web.websocket.manager.WebSocketManager;
 import org.kasource.web.websocket.protocol.ProtocolHandler;
 import org.kasource.web.websocket.util.IoUtils;
 
@@ -18,17 +19,18 @@ import org.kasource.web.websocket.util.IoUtils;
 
 public class TomcatWebSocketClient extends StreamInbound implements WebSocketClient {
 
-    
-    private TomcatWebSocketManager manager;
+    private String username; 
+    private WebSocketManager manager;
     private Map<String, String[]> connectionParameters;
     private String id;
     private IoUtils ioUtils = new IoUtils();
     private ProtocolHandler<String> textProtocol;
     private ProtocolHandler<byte[]> binaryProtocol;
 
-    protected TomcatWebSocketClient(TomcatWebSocketManager manager, String clientId, Map<String, String[]> connectionParameters) {
+    protected TomcatWebSocketClient(WebSocketManager manager, String username, String clientId, Map<String, String[]> connectionParameters) {
         this.connectionParameters = connectionParameters;
         this.manager = manager;
+        this.username = username;
         this.id = clientId;
     }
 
@@ -36,7 +38,7 @@ public class TomcatWebSocketClient extends StreamInbound implements WebSocketCli
 
     @Override
     protected void onBinaryData(InputStream is) throws IOException {
-        manager.onWebSocketMessage(ioUtils.toByteArray(is), binaryProtocol, id);
+        manager.onWebSocketMessage(this, ioUtils.toByteArray(is), binaryProtocol);
 
     }
 
@@ -45,21 +47,21 @@ public class TomcatWebSocketClient extends StreamInbound implements WebSocketCli
     @Override
     protected void onTextData(Reader r) throws IOException {
         
-        manager.onWebSocketMessage(ioUtils.readString(r), textProtocol, id);
+        manager.onWebSocketMessage(this, ioUtils.readString(r), textProtocol);
     }
 
 
 
     @Override
     protected void onOpen(WsOutbound outbound) {
-        manager.registerClient(id, this, connectionParameters);
+        manager.registerClient(this);
     }
 
 
 
     @Override
     protected void onClose(int status) {         
-        manager.unregisterClient(id);
+        manager.unregisterClient(this);
     }
     
    
@@ -101,6 +103,36 @@ public class TomcatWebSocketClient extends StreamInbound implements WebSocketCli
      */
     public void setBinaryProtocol(ProtocolHandler<byte[]> binaryProtocol) {
         this.binaryProtocol = binaryProtocol;
+    }
+
+
+
+    /**
+     * @return the username
+     */
+    @Override
+    public String getUsername() {
+        return username;
+    }
+
+
+
+    /**
+     * @return the connectionParameters
+     */
+    @Override
+    public Map<String, String[]> getConnectionParameters() {
+        return connectionParameters;
+    }
+
+
+
+    /**
+     * @return the id
+     */
+    @Override
+    public String getId() {
+        return id;
     }
 
 

@@ -4,6 +4,7 @@ package org.kasource.web.websocket.guice.example.web;
 
 import java.io.IOException;
 
+import org.kasource.web.websocket.RecipientType;
 import org.kasource.web.websocket.annotations.OnWebSocketEvent;
 import org.kasource.web.websocket.annotations.WebSocketListener;
 import org.kasource.web.websocket.channel.NoSuchWebSocketClient;
@@ -26,7 +27,7 @@ public class ChatServer {
     @OnWebSocketEvent
     public void onClientConnect(WebSocketClientConnectionEvent event) throws NoSuchWebSocketClient, IOException {
         WebSocketChannel channel = event.getSource();
-        channel.sendMessage(event.getClientId(), "Welcome " + event.getClientId());
+        channel.sendMessage("Welcome " + event.getUsername(), event.getClientId(), RecipientType.CLIENT_ID);
         channel.broadcast(event.getClientId() + " joined the conversation.");
     }
     

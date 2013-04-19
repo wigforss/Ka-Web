@@ -1,5 +1,7 @@
 package org.kasource.web.websocket.impl;
 
+import java.util.Map;
+
 import org.kasource.web.websocket.protocol.ProtocolHandler;
 
 /**
@@ -35,4 +37,23 @@ public interface WebSocketClient {
      * @param binaryProtocol the binaryProtocol to set
      */
     public void setBinaryProtocol(ProtocolHandler<byte[]> binaryProtocol);
+    
+    /**
+     * @return the username
+     */
+    public String getUsername();
+
+
+
+    /**
+     * @return the connectionParameters
+     */
+    public Map<String, String[]> getConnectionParameters();
+
+
+
+    /**
+     * @return the id
+     */
+    public String getId();
 }

@@ -4,8 +4,6 @@ package org.kasource.web.websocket.impl.resin;
 
 
 import java.io.IOException;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -24,7 +22,7 @@ public class ResinWebSocketImpl extends HttpServlet {
    
     private static final long serialVersionUID = 1L;
    
-    private Map<String, ResinWebSocketManager> managers = new ConcurrentHashMap<String, ResinWebSocketManager>();
+
     private ServletWebSocketConfig config;
    
 
@@ -35,7 +33,7 @@ public class ResinWebSocketImpl extends HttpServlet {
         config = new ServletWebSocketConfig(getServletConfig());
         config.validateMapping();
         if(!config.isDynamicAddressing()) {
-            getWebSocketManager(config.getMaping());
+            config.getManagerRepository().getWebSocketManager(config.getMaping());
         }
     }
 
@@ -94,23 +92,16 @@ public class ResinWebSocketImpl extends HttpServlet {
         if(config.isDynamicAddressing()) {
             managerName = request.getRequestURI().substring(request.getContextPath().length());
         }
-        ResinWebSocketManager manager = (ResinWebSocketManager) getWebSocketManager(managerName);
+        WebSocketManager manager = config.getManagerRepository().getWebSocketManager(managerName);
+        String username = manager.authenticate(request);
         String id = config.getIdGeneator().getId(request, manager);
-        ResinWebSocketClient client = new ResinWebSocketClient(manager, id, request.getParameterMap());
+        ResinWebSocketClient client = new ResinWebSocketClient(manager, username, id, request.getParameterMap());
         client.setBinaryProtocol(config.getProtocolHandlerFactory().getBinaryProtocol(protocol, true));
         client.setTextProtocol(config.getProtocolHandlerFactory().getTextProtocol(protocol, true));
         return client;
     }
 
-    public WebSocketManager getWebSocketManager(String socketName) {
-        if (!managers.containsKey(socketName)) {
-            ResinWebSocketManager manager = new ResinWebSocketManager();
-            managers.put(socketName, manager);
-            getServletContext().setAttribute(ServletWebSocketConfig.ATTRIBUTE_PREFIX + socketName, manager);
-            return manager;
-        }
-        return managers.get(socketName);
-    }
+   
     
 
 
