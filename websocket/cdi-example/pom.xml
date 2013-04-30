@@ -31,11 +31,11 @@
        				<autoDelete>true</autoDelete>
        				<port>8080</port>
        				<contextRoot>/chat-example</contextRoot>
-       				<commands>
+       			  	<commands>
        					<command>
-       						asadmin set configs.config.server-config.network-config.protocols.protocol.http-listener-1.http.websockets-support-enabled=true
+       						set configs.config.server-config.network-config.protocols.protocol.http-listener-1.http.websockets-support-enabled=true
        					</command>
-       				</commands>
+       				</commands> 
     			</configuration> 
     		</plugin>
     		<plugin>

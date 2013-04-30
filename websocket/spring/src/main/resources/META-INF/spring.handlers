@@ -1,0 +1,1 @@
+http\://kasource.org/schema/spring-websocket=org.kasource.web.websocket.spring.config.springns.WebSocketXmlNamespaceHandler

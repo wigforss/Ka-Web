@@ -5,15 +5,22 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.eclipse.jetty.websocket.WebSocket;
 import org.eclipse.jetty.websocket.WebSocketServlet;
+import org.kasource.web.websocket.bootstrap.WebSocketConfigListener;
+import org.kasource.web.websocket.config.WebSocketConfig;
 import org.kasource.web.websocket.manager.WebSocketManager;
-import org.kasource.web.websocket.util.ServletWebSocketConfig;
+import org.kasource.web.websocket.util.ServletConfigUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 
 public class JettyWebSocketImpl extends WebSocketServlet {
-   
+    private static final Logger LOG = LoggerFactory.getLogger(JettyWebSocketImpl.class);
     private static final long serialVersionUID = 1L;
   
-    private ServletWebSocketConfig config; 
+    
+    private ServletConfigUtil configUtil; 
+    private WebSocketConfig webSocketConfig;
    
    
     
@@ -21,10 +28,17 @@ public class JettyWebSocketImpl extends WebSocketServlet {
     @Override
     public void init() throws ServletException {
         super.init();
-        config = new ServletWebSocketConfig(getServletConfig());
-        config.validateMapping();
-        if(!config.isDynamicAddressing()) {
-            config.getManagerRepository().getWebSocketManager(config.getMaping());
+        configUtil = new ServletConfigUtil(getServletConfig());
+        webSocketConfig = configUtil.getAttributeByClass(WebSocketConfig.class);
+        if(webSocketConfig == null) {         
+            ServletException ex = new ServletException("Could not loacate websocket configuration as ServletContext attribute, make sure to configure " 
+                        + WebSocketConfigListener.class + " as listener in web.xml or use the Spring, Guice or CDI extension.");
+            LOG.error("Could not loacate websocket configuration as ServletContext attribute", ex);
+            throw ex;
+        }
+        configUtil.validateMapping(webSocketConfig.isDynamicAddressing());
+        if(!webSocketConfig.isDynamicAddressing()) {
+            webSocketConfig.getManagerRepository().getWebSocketManager(configUtil.getMaping());
         }
         
     }
@@ -35,22 +49,22 @@ public class JettyWebSocketImpl extends WebSocketServlet {
     public WebSocket doWebSocketConnect(HttpServletRequest request, String protocol) {
       
         // Only accept protocols configured
-        if(protocol != null && !protocol.isEmpty() && !config.getProtocolHandlerFactory().hasProtocol(protocol)) {
+        if(protocol != null && !protocol.isEmpty() && !webSocketConfig.getProtocolHandlerRepository().hasProtocol(protocol)) {
             return null;
         }
-        String managerName = config.getMaping();
+        String managerName = configUtil.getMaping();
         
-        if(config.isDynamicAddressing()) {
+        if(webSocketConfig.isDynamicAddressing()) {
             managerName = request.getRequestURI().substring(request.getContextPath().length());
         }
-        WebSocketManager manager =  config.getManagerRepository().getWebSocketManager(managerName);
+        WebSocketManager manager =  webSocketConfig.getManagerRepository().getWebSocketManager(managerName);
         String username = manager.authenticate(request);
-        String clientId = config.getIdGeneator().getId(request, manager);
+        String clientId = webSocketConfig.getClientIdGenerator().getId(request, manager);
         
          
         JettyWebSocketClient client = new JettyWebSocketClient(manager, username, clientId, request.getParameterMap());
-        client.setBinaryProtocol(config.getProtocolHandlerFactory().getBinaryProtocol(protocol, true));
-        client.setTextProtocol(config.getProtocolHandlerFactory().getTextProtocol(protocol, true));
+        client.setBinaryProtocol(webSocketConfig.getProtocolHandlerRepository().getBinaryProtocol(protocol, true));
+        client.setTextProtocol(webSocketConfig.getProtocolHandlerRepository().getTextProtocol(protocol, true));
         return client;
     }
 
@@ -73,8 +87,8 @@ public class JettyWebSocketImpl extends WebSocketServlet {
         if(origin == null) {
             return false;
         }
-        if(!config.getOrginWhiteList().isEmpty()) {
-            return config.getOrginWhiteList().contains(origin);
+        if(!webSocketConfig.getOrginWhitelist().isEmpty()) {
+            return webSocketConfig.getOrginWhitelist().contains(origin);
         }
         return true;
     }

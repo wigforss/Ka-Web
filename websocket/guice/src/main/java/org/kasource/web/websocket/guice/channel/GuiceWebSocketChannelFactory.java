@@ -20,7 +20,7 @@ public class GuiceWebSocketChannelFactory implements WebSocketChannelFactory {
     
     @Inject
     public GuiceWebSocketChannelFactory(ServletContext servletContext) {
-        factory = (WebSocketChannelFactory) servletContext.getAttribute(WebSocketChannelFactoryImpl.class.getName());
+        factory = (WebSocketChannelFactory) servletContext.getAttribute(WebSocketChannelFactory.class.getName());
     }
 
     @Override

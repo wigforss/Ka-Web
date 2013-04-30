@@ -10,7 +10,7 @@ import java.util.Map;
 
 import org.apache.catalina.websocket.StreamInbound;
 import org.apache.catalina.websocket.WsOutbound;
-import org.kasource.web.websocket.impl.WebSocketClient;
+import org.kasource.web.websocket.client.WebSocketClient;
 import org.kasource.web.websocket.manager.WebSocketManager;
 import org.kasource.web.websocket.protocol.ProtocolHandler;
 import org.kasource.web.websocket.util.IoUtils;

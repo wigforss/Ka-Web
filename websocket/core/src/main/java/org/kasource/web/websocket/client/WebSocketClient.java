@@ -1,4 +1,4 @@
-package org.kasource.web.websocket.impl;
+package org.kasource.web.websocket.client;
 
 import java.util.Map;
 

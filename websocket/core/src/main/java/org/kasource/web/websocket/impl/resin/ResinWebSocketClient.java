@@ -7,7 +7,7 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.util.Map;
 
-import org.kasource.web.websocket.impl.WebSocketClient;
+import org.kasource.web.websocket.client.WebSocketClient;
 import org.kasource.web.websocket.manager.WebSocketManager;
 import org.kasource.web.websocket.protocol.ProtocolHandler;
 import org.kasource.web.websocket.util.IoUtils;

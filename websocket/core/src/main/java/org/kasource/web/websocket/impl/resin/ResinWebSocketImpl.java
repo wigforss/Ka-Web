@@ -10,8 +10,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.kasource.web.websocket.bootstrap.WebSocketConfigListener;
+import org.kasource.web.websocket.config.WebSocketConfig;
 import org.kasource.web.websocket.manager.WebSocketManager;
-import org.kasource.web.websocket.util.ServletWebSocketConfig;
+import org.kasource.web.websocket.util.ServletConfigUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 import com.caucho.websocket.WebSocketListener;
 import com.caucho.websocket.WebSocketServletRequest;
@@ -19,21 +24,30 @@ import com.caucho.websocket.WebSocketServletRequest;
 
 
 public class ResinWebSocketImpl extends HttpServlet {
-   
+    private static final Logger LOG = LoggerFactory.getLogger(ResinWebSocketImpl.class);
     private static final long serialVersionUID = 1L;
    
 
-    private ServletWebSocketConfig config;
+    private ServletConfigUtil configUtil; 
+    private WebSocketConfig webSocketConfig;
    
 
 
     @Override
     public void init() throws ServletException {
         super.init();
-        config = new ServletWebSocketConfig(getServletConfig());
-        config.validateMapping();
-        if(!config.isDynamicAddressing()) {
-            config.getManagerRepository().getWebSocketManager(config.getMaping());
+        configUtil = new ServletConfigUtil(getServletConfig());
+        webSocketConfig = configUtil.getAttributeByClass(WebSocketConfig.class);
+        if(webSocketConfig == null) {         
+            ServletException ex = new ServletException("Could not loacate websocket configuration as ServletContext attribute, make sure to configure " 
+                        + WebSocketConfigListener.class + " as listener in web.xml or use the Spring, Guice or CDI extension.");
+            LOG.error("Could not loacate websocket configuration as ServletContext attribute", ex);
+            throw ex;
+        }
+        
+        configUtil.validateMapping(webSocketConfig.isDynamicAddressing());
+        if(!webSocketConfig.isDynamicAddressing()) {
+            webSocketConfig.getManagerRepository().getWebSocketManager(configUtil.getMaping());
         }
     }
 
@@ -65,7 +79,7 @@ public class ResinWebSocketImpl extends HttpServlet {
 
     private String selectSubProtocol(String[] subProtocols) {
         for (String clientProtocol : subProtocols) {
-            if(config.getProtocolHandlerFactory().hasProtocol(clientProtocol)) {
+            if(webSocketConfig.getProtocolHandlerRepository().hasProtocol(clientProtocol)) {
                 return clientProtocol;
             }
         }
@@ -78,8 +92,8 @@ public class ResinWebSocketImpl extends HttpServlet {
         if (origin == null) {
             return false;
         }
-        if (!config.getOrginWhiteList().isEmpty()) {
-            return config.getOrginWhiteList().contains(origin);
+        if (!webSocketConfig.getOrginWhitelist().isEmpty()) {
+            return webSocketConfig.getOrginWhitelist().contains(origin);
         }
         return true;
     }
@@ -87,17 +101,17 @@ public class ResinWebSocketImpl extends HttpServlet {
 
 
     private WebSocketListener createClient(HttpServletRequest request, String protocol) {
-        String managerName = config.getMaping();
+        String managerName = configUtil.getMaping();
         
-        if(config.isDynamicAddressing()) {
+        if(webSocketConfig.isDynamicAddressing()) {
             managerName = request.getRequestURI().substring(request.getContextPath().length());
         }
-        WebSocketManager manager = config.getManagerRepository().getWebSocketManager(managerName);
+        WebSocketManager manager = webSocketConfig.getManagerRepository().getWebSocketManager(managerName);
         String username = manager.authenticate(request);
-        String id = config.getIdGeneator().getId(request, manager);
+        String id = webSocketConfig.getClientIdGenerator().getId(request, manager);
         ResinWebSocketClient client = new ResinWebSocketClient(manager, username, id, request.getParameterMap());
-        client.setBinaryProtocol(config.getProtocolHandlerFactory().getBinaryProtocol(protocol, true));
-        client.setTextProtocol(config.getProtocolHandlerFactory().getTextProtocol(protocol, true));
+        client.setBinaryProtocol(webSocketConfig.getProtocolHandlerRepository().getBinaryProtocol(protocol, true));
+        client.setTextProtocol(webSocketConfig.getProtocolHandlerRepository().getTextProtocol(protocol, true));
         return client;
     }
 

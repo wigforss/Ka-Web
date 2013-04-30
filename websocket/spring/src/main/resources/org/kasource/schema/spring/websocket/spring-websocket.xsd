@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://kasource.org/schema/spring-websocket"           
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:beans="http://www.springframework.org/schema/beans"
+	targetNamespace="http://kasource.org/schema/spring-websocket"
+	elementFormDefault="qualified" attributeFormDefault="unqualified">
+
+	<xsd:import namespace="http://www.springframework.org/schema/beans" />
+	
+	<xsd:element name="websocket">
+		<xsd:complexType>
+			<xsd:attribute name="dynamicAddressing" type="xsd:boolean" default="false"/>
+			<xsd:attribute name="clientIdGeneratorRef" type="xsd:string" use="optional"/>
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="authentication">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="authenticationUrlMapping" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="defaultProviderRef" type="xsd:string" use="optional"/>
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="authenticationUrlMapping">
+		<xsd:complexType>
+			<xsd:attribute name="url" type="xsd:string" use="required"/>
+			<xsd:attribute name="ref" type="xsd:string" use="required"/>
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="textProtocolHandlers">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="protocolHandler" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="defaultTextProtocolRef" type="xsd:string" use="optional"/>
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="binaryProtocolHandlers">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="protocolHandler" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="defaultBinaryProtocolRef" type="xsd:string" use="optional"/>
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="protocolHandler">
+    	<xsd:complexType>
+			<xsd:attribute name="ref" type="xsd:string" use="optional"/>
+		</xsd:complexType>
+	</xsd:element>
+	
+	
+</xsd:schema>

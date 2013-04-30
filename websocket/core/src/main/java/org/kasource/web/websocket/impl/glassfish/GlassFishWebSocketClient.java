@@ -3,7 +3,7 @@ package org.kasource.web.websocket.impl.glassfish;
 import java.util.Map;
 
 
-import org.kasource.web.websocket.impl.WebSocketClient;
+import org.kasource.web.websocket.client.WebSocketClient;
 import org.kasource.web.websocket.manager.WebSocketManager;
 
 

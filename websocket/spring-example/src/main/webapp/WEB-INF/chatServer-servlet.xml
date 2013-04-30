@@ -6,6 +6,7 @@
     xmlns:context="http://www.springframework.org/schema/context"
     xmlns:aop="http://www.springframework.org/schema/aop"  
     xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xmlns:websocket="http://kasource.org/schema/spring-websocket"
     xsi:schemaLocation="
         http://www.springframework.org/schema/beans 
         http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
@@ -18,15 +19,23 @@
         http://www.springframework.org/schema/aop  
 	 	http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
 	 	http://www.springframework.org/schema/aop  
-	    http://www.springframework.org/schema/aop/spring-aop-3.0.xsd"
- >
+	    http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+	    http://kasource.org/schema/spring-websocket
+	    http://kasource.org/schema/spring-websocket/spring-websocket-1.0.xsd">
 
 	
     <context:component-scan base-package="org.kasource.web.websocket.spring.example"/>
     	
 	 <aop:aspectj-autoproxy proxy-target-class="true"/>
 	 <mvc:annotation-driven/>
-    
-    <bean class="org.kasource.web.websocket.spring.registration.WebSocketListenerPostBeanProcessor"/>
+	 
+	
+	 
+	
+     <websocket:websocket dynamicAddressing="true" clientIdGeneratorRef="clientIdGenerator"/>
+     <websocket:authentication defaultProviderRef="authenticationProvider"/> 
+     
+     <bean id="authenticationProvider" class="org.kasource.web.websocket.security.PassthroughAutenticationProvider"/>
+  	 <bean id="clientIdGenerator" class="org.kasource.web.websocket.client.id.ClientIdGeneratorImpl"/>
 	
 </beans>

@@ -1,7 +1,7 @@
 package org.kasource.web.websocket.event;
 
 import org.kasource.web.websocket.channel.WebSocketChannel;
-import org.kasource.web.websocket.impl.WebSocketClient;
+import org.kasource.web.websocket.client.WebSocketClient;
 
 /**
  * Event emitted when a client has connected to a web socket.

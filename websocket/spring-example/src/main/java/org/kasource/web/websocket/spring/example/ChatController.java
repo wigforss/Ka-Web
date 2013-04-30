@@ -32,33 +32,27 @@ import org.springframework.stereotype.Controller;
 @Controller
 public class ChatController {
 
-    @Autowired
-    private WebSocketChannelFactory channelFactory;
+   
     
     @OnWebSocketEvent
-    public void recieveMessage(WebSocketTextObjectMessageEvent event) {
+    public void recieveMessage(WebSocketTextMessageEvent event) {
         WebSocketChannel socket = event.getSource();
-        Message message = event.getMessageAsObject(Message.class);
-        message.setBody(event.getClientId() + " says: " + message.getBody());
-        socket.broadcastObject(message, event.getProtocolHandler());
+      
+        socket.broadcast(event.getUsername()+ " says: " + event.getMessage());
     }
     
     @OnWebSocketEvent
     public void onClientConnect(WebSocketClientConnectionEvent event) throws NoSuchWebSocketClient, IOException {
         WebSocketChannel socket = event.getSource();
-        Message message = new Message();
-        message.setBody("Welcome " + event.getUsername());
-        socket.sendMessageAsXml(message, event.getClientId(), RecipientType.CLIENT_ID);
-        message.setBody(event.getClientId() + " joined the conversation.");
-        socket.broadcastXmlMessage(event.getClientId() + " joined the conversation.");
+        socket.sendMessage("Welcome " + event.getUsername(), event.getClientId(), RecipientType.CLIENT_ID);
+        
+        socket.broadcast(event.getUsername() + " joined the conversation.");
     }
     
     @OnWebSocketEvent
     public void onClientDisconnect(WebSocketClientDisconnectedEvent event) {
         WebSocketChannel socket = event.getSource();
-        Message message = new Message();
-        message.setBody(event.getUsername() + " left the conversation.");
-       socket.broadcastXmlMessage(message);
+       socket.broadcast(event.getUsername() + " left the conversation.");
     }
     
    

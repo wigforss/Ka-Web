@@ -27,7 +27,7 @@ public class CdiWebSocketChannelFactory implements WebSocketChannelFactory {
      * @param servletContext ServletContext to use.
      **/
     public void onServletContextInitialized(@Observes ServletContext servletContext) {
-        factory = (WebSocketChannelFactory) servletContext.getAttribute(WebSocketChannelFactoryImpl.class.getName());
+        factory = (WebSocketChannelFactory) servletContext.getAttribute(WebSocketChannelFactory.class.getName());
         instance = this;
     }
 
@@ -48,5 +48,17 @@ public class CdiWebSocketChannelFactory implements WebSocketChannelFactory {
         } else {
            throw new IllegalStateException("CdiWebSocketChannelFactory has not yet been initialized with a ServletContext");
         }
+    }
+
+    @Override
+    public void addWebSocketManagerFromAttribute(String attributeName, Object attributeValue) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void initialize(ServletContext servletContext) throws Exception {
+        // TODO Auto-generated method stub
+        
     }
 }

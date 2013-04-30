@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.eclipse.jetty.websocket.WebSocket;
-import org.kasource.web.websocket.impl.WebSocketClient;
+import org.kasource.web.websocket.client.WebSocketClient;
 import org.kasource.web.websocket.manager.WebSocketManager;
 import org.kasource.web.websocket.protocol.ProtocolHandler;
 

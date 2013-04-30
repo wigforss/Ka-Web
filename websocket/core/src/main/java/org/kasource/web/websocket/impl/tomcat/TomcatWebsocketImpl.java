@@ -10,9 +10,11 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.catalina.websocket.StreamInbound;
 import org.apache.catalina.websocket.WebSocketServlet;
+import org.kasource.web.websocket.bootstrap.WebSocketConfigListener;
+import org.kasource.web.websocket.config.WebSocketConfig;
 import org.kasource.web.websocket.manager.WebSocketManager;
-import org.kasource.web.websocket.protocol.ProtocolHandlerFactory;
-import org.kasource.web.websocket.util.ServletWebSocketConfig;
+import org.kasource.web.websocket.protocol.ProtocolHandlerRepository;
+import org.kasource.web.websocket.util.ServletConfigUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,8 +25,8 @@ public class TomcatWebsocketImpl extends WebSocketServlet {
     private static final long serialVersionUID = 1L;
     private static final Logger LOG = LoggerFactory.getLogger(TomcatWebsocketImpl.class);
    
-    private ServletWebSocketConfig config; 
-   
+    private ServletConfigUtil configUtil; 
+    private WebSocketConfig webSocketConfig;
     private int outboundByteBufferSize;
 
     private int outboundCharBufferSize;
@@ -33,14 +35,20 @@ public class TomcatWebsocketImpl extends WebSocketServlet {
     @Override
     public void init() throws ServletException {
         super.init();
-        config = new ServletWebSocketConfig(getServletConfig());
-      
-        outboundByteBufferSize = config.parseInitParamAsInt("outboundByteBufferSize");
-        outboundCharBufferSize = config.parseInitParamAsInt("outboundCharBufferSize");
+        configUtil = new ServletConfigUtil(getServletConfig());
+        webSocketConfig = configUtil.getAttributeByClass(WebSocketConfig.class);
+        if(webSocketConfig == null) {         
+            ServletException ex = new ServletException("Could not loacate websocket configuration as ServletContext attribute, make sure to configure " 
+                        + WebSocketConfigListener.class + " as listener in web.xml or use the Spring, Guice or CDI extension.");
+            LOG.error("Could not loacate websocket configuration as ServletContext attribute", ex);
+            throw ex;
+        }
+        outboundByteBufferSize = configUtil.parseInitParamAsInt("outboundByteBufferSize");
+        outboundCharBufferSize = configUtil.parseInitParamAsInt("outboundCharBufferSize");
        
-        config.validateMapping();
-        if(!config.isDynamicAddressing()) {
-            config.getManagerRepository().getWebSocketManager(config.getMaping());
+        configUtil.validateMapping(webSocketConfig.isDynamicAddressing());
+        if(!webSocketConfig.isDynamicAddressing()) {
+            webSocketConfig.getManagerRepository().getWebSocketManager(configUtil.getMaping());
            
         } 
     }
@@ -50,20 +58,20 @@ public class TomcatWebsocketImpl extends WebSocketServlet {
 
     @Override
     protected StreamInbound createWebSocketInbound(String subProtocol, HttpServletRequest request) {
-        String managerName = config.getMaping();
+        String managerName = configUtil.getMaping();
        
-        if(config.isDynamicAddressing()) {
+        if(webSocketConfig.isDynamicAddressing()) {
             managerName = request.getRequestURI().substring(request.getContextPath().length());
         }
        
-        WebSocketManager manager =   config.getManagerRepository().getWebSocketManager(managerName);
+        WebSocketManager manager =   webSocketConfig.getManagerRepository().getWebSocketManager(managerName);
         
         String username = manager.authenticate(request);
      
         
-        String id = config.getIdGeneator().getId(request, manager);
+        String id = webSocketConfig.getClientIdGenerator().getId(request, manager);
         TomcatWebSocketClient client = new TomcatWebSocketClient(manager, username, id, request.getParameterMap());
-        ProtocolHandlerFactory protocols = config.getProtocolHandlerFactory();
+        ProtocolHandlerRepository protocols = webSocketConfig.getProtocolHandlerRepository();
         client.setBinaryProtocol(protocols.getBinaryProtocol(subProtocol, true));
         client.setTextProtocol(protocols.getTextProtocol(subProtocol, true));
      
@@ -99,15 +107,15 @@ public class TomcatWebsocketImpl extends WebSocketServlet {
         if(origin == null) {
             return false;
         }
-        if(!config.getOrginWhiteList().isEmpty()) {
-            return config.getOrginWhiteList().contains(origin);
+        if(!webSocketConfig.getOrginWhitelist().isEmpty()) {
+            return webSocketConfig.getOrginWhitelist().contains(origin);
         }
         return true;
     }
     
     protected String selectSubProtocol(List<String> subProtocols) {     
         for (String clientProtocol : subProtocols) {
-            if(config.getProtocolHandlerFactory().hasProtocol(clientProtocol)) {
+            if(webSocketConfig.getProtocolHandlerRepository().hasProtocol(clientProtocol)) {
                 return clientProtocol;
             }
         }

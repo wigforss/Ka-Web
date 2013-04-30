@@ -8,12 +8,29 @@
         http://www.springframework.org/schema/context 
         http://www.springframework.org/schema/context/spring-context-3.0.xsd"
  >
-
+   
+ 	<bean id="webSocketChannelFactory" class="org.kasource.web.websocket.spring.channel.SpringWebSocketChannelFactory"/> 
+	
+	<bean id="managerRepository" class="org.kasource.web.websocket.spring.manager.SpringWebSocketManagerRepository">
+		<property name="defaultAuthenticationProvider">
+			<bean class="org.kasource.web.websocket.security.PassthroughAutenticationProvider"/>
+		</property>
+	</bean>
+	
+	<bean id="webSocketConfig" class="org.kasource.web.websocket.spring.config.SpringWebSocketConfig" init-method="initialize">
+		<property name="managerRepository" ref="managerRepository"/>
+		<property name="clientIdGenerator">
+			<bean class="org.kasource.web.websocket.client.id.ClientIdGeneratorImpl"/>
+		</property>
+		<property name="dynamicAddressing" value="true"/>
+		<property name="channelFactory" ref="webSocketChannelFactory"/>
+	</bean>	
     
-    <bean id="webSocketChannelFactory" class="org.kasource.web.websocket.spring.channel.SpringWebSocketChannelFactory"/>
+  
     	
     
     <bean id="chatWebSocket" factory-bean="webSocketChannelFactory" factory-method="get">
         <constructor-arg value="/chat"/>
     </bean>
+    
 </beans>
