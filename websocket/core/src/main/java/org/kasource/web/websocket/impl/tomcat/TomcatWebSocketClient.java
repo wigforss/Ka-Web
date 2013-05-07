@@ -11,7 +11,7 @@ import java.util.Map;
 import org.apache.catalina.websocket.StreamInbound;
 import org.apache.catalina.websocket.WsOutbound;
 import org.kasource.web.websocket.client.WebSocketClient;
-import org.kasource.web.websocket.manager.WebSocketManager;
+import org.kasource.web.websocket.client.WebSocketClientConfig;
 import org.kasource.web.websocket.protocol.ProtocolHandler;
 import org.kasource.web.websocket.util.IoUtils;
 
@@ -19,26 +19,21 @@ import org.kasource.web.websocket.util.IoUtils;
 
 public class TomcatWebSocketClient extends StreamInbound implements WebSocketClient {
 
-    private String username; 
-    private WebSocketManager manager;
-    private Map<String, String[]> connectionParameters;
-    private String id;
+    private WebSocketClientConfig clientConfig;
     private IoUtils ioUtils = new IoUtils();
-    private ProtocolHandler<String> textProtocol;
-    private ProtocolHandler<byte[]> binaryProtocol;
+    private ProtocolHandler<String> textProtocolHandler;
+    
+    private ProtocolHandler<byte[]> binaryProtocolHandler;
 
-    protected TomcatWebSocketClient(WebSocketManager manager, String username, String clientId, Map<String, String[]> connectionParameters) {
-        this.connectionParameters = connectionParameters;
-        this.manager = manager;
-        this.username = username;
-        this.id = clientId;
+    protected TomcatWebSocketClient(WebSocketClientConfig clientConfig) {
+        this.clientConfig = clientConfig;
     }
 
 
 
     @Override
     protected void onBinaryData(InputStream is) throws IOException {
-        manager.onWebSocketMessage(this, ioUtils.toByteArray(is), binaryProtocol);
+        clientConfig.getManager().onWebSocketMessage(this, ioUtils.toByteArray(is));
 
     }
 
@@ -47,21 +42,21 @@ public class TomcatWebSocketClient extends StreamInbound implements WebSocketCli
     @Override
     protected void onTextData(Reader r) throws IOException {
         
-        manager.onWebSocketMessage(this, ioUtils.readString(r), textProtocol);
+        clientConfig.getManager().onWebSocketMessage(this, ioUtils.readString(r));
     }
 
 
 
     @Override
     protected void onOpen(WsOutbound outbound) {
-        manager.registerClient(this);
+        clientConfig.getManager().registerClient(this);
     }
 
 
 
     @Override
     protected void onClose(int status) {         
-        manager.unregisterClient(this);
+        clientConfig.getManager().unregisterClient(this);
     }
     
    
@@ -88,22 +83,7 @@ public class TomcatWebSocketClient extends StreamInbound implements WebSocketCli
     }
 
 
-    /**
-     * @param textProtocol the textProtocol to set
-     */
-    public void setTextProtocol(ProtocolHandler<String> textProtocol) {
-        this.textProtocol = textProtocol;
-    }
-
-
-
-
-    /**
-     * @param binaryProtocol the binaryProtocol to set
-     */
-    public void setBinaryProtocol(ProtocolHandler<byte[]> binaryProtocol) {
-        this.binaryProtocol = binaryProtocol;
-    }
+   
 
 
 
@@ -112,7 +92,7 @@ public class TomcatWebSocketClient extends StreamInbound implements WebSocketCli
      */
     @Override
     public String getUsername() {
-        return username;
+        return clientConfig.getUsername();
     }
 
 
@@ -122,7 +102,7 @@ public class TomcatWebSocketClient extends StreamInbound implements WebSocketCli
      */
     @Override
     public Map<String, String[]> getConnectionParameters() {
-        return connectionParameters;
+        return clientConfig.getConnectionParameters();
     }
 
 
@@ -132,7 +112,55 @@ public class TomcatWebSocketClient extends StreamInbound implements WebSocketCli
      */
     @Override
     public String getId() {
-        return id;
+        return clientConfig.getClientId();
+    }
+
+    @Override
+    public String getUrl() {
+        return clientConfig.getUrl();
+    }
+    
+    @Override
+    public String getSubProtocol() {
+        return clientConfig.getSubProtocol();
+    }
+
+    /**
+     * @return the textProtocolHandler
+     */
+    @Override
+    public ProtocolHandler<String> getTextProtocolHandler() {
+        return textProtocolHandler;
+    }
+
+
+
+    /**
+     * @param textProtocolHandler the textProtocolHandler to set
+     */
+    @Override
+    public void setTextProtocolHandler(ProtocolHandler<String> textProtocolHandler) {
+        this.textProtocolHandler = textProtocolHandler;
+    }
+
+
+
+    /**
+     * @return the binaryProtocolHandler
+     */
+    @Override
+    public ProtocolHandler<byte[]> getBinaryProtocolHandler() {
+        return binaryProtocolHandler;
+    }
+
+
+
+    /**
+     * @param binaryProtocolHandler the binaryProtocolHandler to set
+     */
+    @Override
+    public void setBinaryProtocolHandler(ProtocolHandler<byte[]> binaryProtocolHandler) {
+        this.binaryProtocolHandler = binaryProtocolHandler;
     }
 
 

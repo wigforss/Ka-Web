@@ -25,18 +25,7 @@ public interface WebSocketClient {
      **/
     public void sendMessageToSocket(byte[] message);
     
-    /**
-     * @param textProtocol the textProtocol to set
-     */
-    public void setTextProtocol(ProtocolHandler<String> textProtocol);
-
-
-
-
-    /**
-     * @param binaryProtocol the binaryProtocol to set
-     */
-    public void setBinaryProtocol(ProtocolHandler<byte[]> binaryProtocol);
+   
     
     /**
      * @return the username
@@ -50,8 +39,18 @@ public interface WebSocketClient {
      */
     public Map<String, String[]> getConnectionParameters();
 
+    public void setTextProtocolHandler(ProtocolHandler<String> protocolHandler); 
 
-
+    public void setBinaryProtocolHandler(ProtocolHandler<byte[]> protocolHandler); 
+    
+    public ProtocolHandler<String> getTextProtocolHandler();
+    
+    public ProtocolHandler<byte[]> getBinaryProtocolHandler();
+    
+    public String getUrl();
+    
+    public String getSubProtocol();
+    
     /**
      * @return the id
      */

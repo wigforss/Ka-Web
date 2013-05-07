@@ -13,6 +13,7 @@ import org.kasource.web.websocket.channel.NoSuchWebSocketClient;
 import org.kasource.web.websocket.client.WebSocketClient;
 import org.kasource.web.websocket.internal.ClientListener;
 import org.kasource.web.websocket.protocol.ProtocolHandler;
+import org.kasource.web.websocket.protocol.ProtocolHandlerRepository;
 import org.kasource.web.websocket.security.AuthenticationException;
 import org.kasource.web.websocket.security.AuthenticationProvider;
 import org.slf4j.Logger;
@@ -33,7 +34,9 @@ public class WebSocketManagerImpl implements WebSocketManager {
     private Set<ClientListener> webSocketClientListeners = new HashSet<ClientListener>();
  
     private AuthenticationProvider authenticationProvider;
-
+    private ProtocolHandlerRepository protocolHandlerRepository;
+    
+    
     /**
      * Broadcast a text message to all clients.
      * 
@@ -159,6 +162,10 @@ public class WebSocketManagerImpl implements WebSocketManager {
      **/
     @Override
     public void registerClient(WebSocketClient client) {
+        ProtocolHandler<String> textProtocolHandler = protocolHandlerRepository.getTextProtocol(client.getSubProtocol(), client.getUrl(), true);
+        client.setTextProtocolHandler(textProtocolHandler);
+        ProtocolHandler<byte[]> binaryProtocolHandler = protocolHandlerRepository.getBinaryProtocol(client.getSubProtocol(), client.getUrl(), true);
+        client.setBinaryProtocolHandler(binaryProtocolHandler);
         clients.put(client.getId(), client);
         addClientForUser(client);
         if (!webSocketClientListeners.isEmpty()) {
@@ -239,10 +246,11 @@ public class WebSocketManagerImpl implements WebSocketManager {
      * @param id        ID of the client
      */
     @Override
-    public void onWebSocketMessage(WebSocketClient client, String message, ProtocolHandler<String> protocol) {
+    public void onWebSocketMessage(WebSocketClient client, String message) {
+       
         if(!webSocketClientListeners.isEmpty()) {
             for(ClientListener listener: webSocketClientListeners) {
-                listener.onMessage(client, message, protocol);
+                listener.onMessage(client, message, client.getTextProtocolHandler());
             }  
         }
     }
@@ -254,10 +262,12 @@ public class WebSocketManagerImpl implements WebSocketManager {
      * @param id        ID of the client
      */
     @Override
-    public void onWebSocketMessage(WebSocketClient client, byte[] message, ProtocolHandler<byte[]> protocol) {
+    public void onWebSocketMessage(WebSocketClient client, byte[] message) {
+      
+       
         if(!webSocketClientListeners.isEmpty()) {
             for(ClientListener listener: webSocketClientListeners) {
-                listener.onBinaryMessage(client, message, protocol);
+                listener.onBinaryMessage(client, message, client.getBinaryProtocolHandler());
             }
         }
     }
@@ -279,6 +289,18 @@ public class WebSocketManagerImpl implements WebSocketManager {
      */
     public void setAuthenticationProvider(AuthenticationProvider authenticationProvider) {
         this.authenticationProvider = authenticationProvider;
+    }
+
+    @Override
+    public ProtocolHandlerRepository getProtocolHandlerRepository() {
+        return protocolHandlerRepository;
+    }
+
+    /**
+     * @param protocolHandlerRepository the protocolHandlerRepository to set
+     */
+    public void setProtocolHandlerRepository(ProtocolHandlerRepository protocolHandlerRepository) {
+        this.protocolHandlerRepository = protocolHandlerRepository;
     }
      
    

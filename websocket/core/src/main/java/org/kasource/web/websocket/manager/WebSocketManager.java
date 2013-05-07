@@ -7,6 +7,7 @@ import org.kasource.web.websocket.channel.WebsocketMessageSender;
 import org.kasource.web.websocket.client.WebSocketClient;
 import org.kasource.web.websocket.internal.ClientListener;
 import org.kasource.web.websocket.protocol.ProtocolHandler;
+import org.kasource.web.websocket.protocol.ProtocolHandlerRepository;
 import org.kasource.web.websocket.security.AuthenticationException;
 
 
@@ -41,10 +42,10 @@ public interface WebSocketManager extends WebsocketMessageSender {
     public String authenticate(HttpServletRequest request) throws AuthenticationException;
 
 
-    public void onWebSocketMessage(WebSocketClient client, byte[] byteArray, ProtocolHandler<byte[]> binaryProtocol);
+    public void onWebSocketMessage(WebSocketClient client, byte[] byteArray);
 
 
-    public void onWebSocketMessage(WebSocketClient client, String readString, ProtocolHandler<String> textProtocol);
+    public void onWebSocketMessage(WebSocketClient client, String readString);
 
 
     public void registerClient(WebSocketClient webSocketClient);
@@ -54,4 +55,6 @@ public interface WebSocketManager extends WebsocketMessageSender {
 
 
     public boolean hasClient(String clientId);
+    
+    public ProtocolHandlerRepository getProtocolHandlerRepository();
 }

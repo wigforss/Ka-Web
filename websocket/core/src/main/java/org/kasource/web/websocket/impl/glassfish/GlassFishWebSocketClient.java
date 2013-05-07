@@ -2,60 +2,51 @@ package org.kasource.web.websocket.impl.glassfish;
 
 import java.util.Map;
 
-
 import org.kasource.web.websocket.client.WebSocketClient;
-import org.kasource.web.websocket.manager.WebSocketManager;
+import org.kasource.web.websocket.client.WebSocketClientConfig;
 
-
-import com.sun.grizzly.websockets.ProtocolHandler;
 import com.sun.grizzly.websockets.DataFrame;
 import com.sun.grizzly.websockets.DefaultWebSocket;
+import com.sun.grizzly.websockets.ProtocolHandler;
 import com.sun.grizzly.websockets.WebSocketListener;
 
 public class GlassFishWebSocketClient extends DefaultWebSocket implements WebSocketClient {
 
-    private String username;
-    private WebSocketManager manager;
-    private String id;
-    private Map<String, String[]> connectionParameters;
-    private org.kasource.web.websocket.protocol.ProtocolHandler<String> textProtocol;
-    private org.kasource.web.websocket.protocol.ProtocolHandler<byte[]> binaryProtocol;
-    
-    public GlassFishWebSocketClient(WebSocketManager manager, 
+   private WebSocketClientConfig clientConfig;
+   private org.kasource.web.websocket.protocol.ProtocolHandler<String> textProtocolHandler;
+   private org.kasource.web.websocket.protocol.ProtocolHandler<byte[]> binaryProtocolHandler;
+   
+    public GlassFishWebSocketClient(
                                     ProtocolHandler protocolHandler, 
-                                    WebSocketListener[] listeners, 
-                                    String username, 
-                                    String clientId, 
-                                    Map<String, String[]> connectionParameters) {
+                                    WebSocketListener[] listeners,
+                                    WebSocketClientConfig clientConfig) {
         super(protocolHandler, listeners);
-        this.connectionParameters = connectionParameters;
-        this.manager = manager;
-        this.username = username;
-        this.id = clientId;
+        this.clientConfig = clientConfig;
+
     }
 
     @Override
     public void onClose(DataFrame frame) {
         super.onClose(frame); 
-        manager.unregisterClient(this);
+        clientConfig.getManager().unregisterClient(this);
     }
 
     @Override
     public void onConnect() {
         super.onConnect();
-        manager.registerClient(this);     
+        clientConfig.getManager().registerClient(this);     
     }
 
     @Override
     public void onMessage(String text) {
         super.onMessage(text);
-        manager.onWebSocketMessage(this, text, textProtocol);
+        clientConfig.getManager().onWebSocketMessage(this, text);
     }
 
     @Override
     public void onMessage(byte[] bytes) {
         super.onMessage(bytes);
-        manager.onWebSocketMessage(this, bytes, binaryProtocol);
+        clientConfig.getManager().onWebSocketMessage(this, bytes);
     }
 
    
@@ -67,27 +58,14 @@ public class GlassFishWebSocketClient extends DefaultWebSocket implements WebSoc
         super.send(message);
     }
     
-    /**
-     * @param textProtocol the textProtocol to set
-     */
-    public void setTextProtocol(org.kasource.web.websocket.protocol.ProtocolHandler<String> textProtocol) {
-        this.textProtocol = textProtocol;
-    }
-
-
-    /**
-     * @param binaryProtocol the binaryProtocol to set
-     */
-    public void setBinaryProtocol(org.kasource.web.websocket.protocol.ProtocolHandler<byte[]> binaryProtocol) {
-        this.binaryProtocol = binaryProtocol;
-    }
+    
     
     /**
      * @return the username
      */
     @Override
     public String getUsername() {
-        return username;
+        return clientConfig.getUsername();
     }
 
 
@@ -97,7 +75,7 @@ public class GlassFishWebSocketClient extends DefaultWebSocket implements WebSoc
      */
     @Override
     public Map<String, String[]> getConnectionParameters() {
-        return connectionParameters;
+        return clientConfig.getConnectionParameters();
     }
 
 
@@ -107,8 +85,54 @@ public class GlassFishWebSocketClient extends DefaultWebSocket implements WebSoc
      */
     @Override
     public String getId() {
-        return id;
+        return clientConfig.getClientId();
+    }
+
+    @Override
+    public String getUrl() {
+        return clientConfig.getUrl();
+    }
+    
+    @Override
+    public String getSubProtocol() {
+        return clientConfig.getSubProtocol();
+    }
+
+    /**
+     * @return the textProtocolHandler
+     */
+    @Override
+    public org.kasource.web.websocket.protocol.ProtocolHandler<String> getTextProtocolHandler() {
+        return textProtocolHandler;
     }
 
 
+
+    /**
+     * @param textProtocolHandler the textProtocolHandler to set
+     */
+    @Override
+    public void setTextProtocolHandler(org.kasource.web.websocket.protocol.ProtocolHandler<String> textProtocolHandler) {
+        this.textProtocolHandler = textProtocolHandler;
+    }
+
+
+
+    /**
+     * @return the binaryProtocolHandler
+     */
+    @Override
+    public org.kasource.web.websocket.protocol.ProtocolHandler<byte[]> getBinaryProtocolHandler() {
+        return binaryProtocolHandler;
+    }
+
+
+
+    /**
+     * @param binaryProtocolHandler the binaryProtocolHandler to set
+     */
+    @Override
+    public void setBinaryProtocolHandler(org.kasource.web.websocket.protocol.ProtocolHandler<byte[]> binaryProtocolHandler) {
+        this.binaryProtocolHandler = binaryProtocolHandler;
+    }
 }

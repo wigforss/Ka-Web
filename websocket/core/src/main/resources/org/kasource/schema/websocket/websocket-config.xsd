@@ -6,12 +6,24 @@
 	<xs:element name="websocket-config">
 		<xs:complexType>
 			<xs:sequence>
+				<xs:element ref="websocket" minOccurs="1" maxOccurs="unbounded"/>
 				<xs:element ref="orginWhitelist" minOccurs="0" maxOccurs="1"/>
 				<xs:element ref="clientIdGenerator" minOccurs="0" maxOccurs="1"/>
 				<xs:element ref="authentication" minOccurs="0" maxOccurs="1"/>
 				<xs:element ref="textProtocolHandler" minOccurs="0" maxOccurs="1"/>
 				<xs:element ref="binaryProtocolHandler" minOccurs="0" maxOccurs="1"/>
 			</xs:sequence>
+			
+		</xs:complexType>
+	</xs:element>
+	
+	
+	<xs:element name="websocket">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="clientIdGenerator" type="clientIdGenerator" minOccurs="0" maxOccurs="1"/>
+			</xs:sequence>
+			<xs:attribute name="servletName" type="xs:string" use="required"/>
 			<xs:attribute name="dynamicAddressing" type="xs:boolean" default="false"/>
 		</xs:complexType>
 	</xs:element>
@@ -24,14 +36,15 @@
 		</xs:complexType>
 	</xs:element>
 	
+	<xs:element name="clientIdGenerator" type="clientIdGenerator"/>
 	
-	<xs:element name="clientIdGenerator">
-		<xs:complexType>
-			<xs:attribute name="class" type="javaClass" use="required"/>
-			<xs:attribute name="idKey" type="xs:string" use="optional"/>
-			<xs:attribute name="headerValue" type="xs:boolean" default="false"/>
-		</xs:complexType>
-	</xs:element>
+
+	<xs:complexType name="clientIdGenerator">
+		<xs:attribute name="class" type="javaClass" use="required"/>
+		<xs:attribute name="idKey" type="xs:string" use="optional"/>
+		<xs:attribute name="headerValue" type="xs:boolean" default="false"/>
+	</xs:complexType>
+
 	
 	<xs:element name="authentication">
 		<xs:complexType>
@@ -63,13 +76,24 @@
 	<xs:element name="textProtocolHandler" type="protocolHandler"/>
 	<xs:element name="binaryProtocolHandler" type="protocolHandler"/>
 	
-	
-    <xs:complexType name="protocolHandler">
+	 <xs:complexType name="protocolHandler">
 		<xs:sequence>
 			<xs:element name="handlerClass" type="javaClass" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element ref="protocolUrlMapping" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>
 		<xs:attribute name="defaultHandlerClass" type="javaClass" use="optional"/>
 	</xs:complexType>
+	
+	<xs:element name="protocolUrlMapping">
+		<xs:complexType>
+		    <xs:sequence>
+		    	<xs:element name="handlerClass" type="javaClass" minOccurs="0" maxOccurs="unbounded"/>
+		    </xs:sequence>
+			<xs:attribute name="url" type="xs:string" use="required"/>
+			<xs:attribute name="defaultHandlerClass" type="javaClass" use="optional"/>
+		</xs:complexType>
+	</xs:element>
+	
 	
 	
 	<!-- Types -->

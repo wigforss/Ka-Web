@@ -29,13 +29,30 @@
 	 <aop:aspectj-autoproxy proxy-target-class="true"/>
 	 <mvc:annotation-driven/>
 	 
+	 <bean id="jsonProtocol" class="org.kasource.web.websocket.protocol.JsonProtocolHandler"/>
 	
-	 
+	 <websocket:textProtocolHandlers>
+	 	<websocket:protocolUrlMapping url="/chat/*">
+	 			<websocket:protocolHandler defaultProtocolRef="jsonProtocol"/>
+	 	</websocket:protocolUrlMapping>
+	 </websocket:textProtocolHandlers>
 	
-     <websocket:websocket dynamicAddressing="true" clientIdGeneratorRef="clientIdGenerator"/>
-     <websocket:authentication defaultProviderRef="authenticationProvider"/> 
+     <websocket:websocket clientIdGeneratorRef="clientIdGenerator"/>
+     
+     <websocket:servlet servletName="chat" dynamicAddressing="true"/>
+     
+     <websocket:originWhitelist>
+     	<websocket:origin>http://localhost:8080</websocket:origin>
+     </websocket:originWhitelist>
+     
+     <websocket:authentication>
+     	<websocket:authenticationUrlMapping url="/chat/*" ref="authenticationProvider"/>
+     </websocket:authentication> 
      
      <bean id="authenticationProvider" class="org.kasource.web.websocket.security.PassthroughAutenticationProvider"/>
   	 <bean id="clientIdGenerator" class="org.kasource.web.websocket.client.id.ClientIdGeneratorImpl"/>
 	
+	 <!--
+	<bean class="org.kasource.web.websocket.spring.registration.WebSocketListenerPostBeanProcessor"/>
+	-->
 </beans>

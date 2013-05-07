@@ -56,29 +56,29 @@ public class WebSocketChannelFactoryImpl implements  WebSocketChannelFactory {
     
     
     /**
-     * Returns the WebSocket with channelName.
+     * Returns the WebSocket for a URL.
      * 
      * Note that if this method is invoked before such a 
      * WebSocket is available, an uninitialized WebSocket will be returned, 
      * which might be initialized at a later point in time.
      * 
-     * @param channelName    Name of the socket to return.
+     * @param url    Name of the socket to return.
      * 
-     * @return A WebSocket representing channelName supplied.
+     * @return A WebSocket representing URL supplied.
      **/
-    public WebSocketChannelImpl get(String channelName) {
-        if (webSockets.containsKey(channelName)) {
-            return webSockets.get(channelName);
+    public WebSocketChannelImpl get(String url) {
+        if (webSockets.containsKey(url)) {
+            return webSockets.get(url);
         }
         
-        WebSocketManager manager = (WebSocketManager) servletContext.getAttribute(channelName);
+        WebSocketManager manager = (WebSocketManager) servletContext.getAttribute(url);
         WebSocketChannelImpl webSocket = null;
         if (manager == null) {
              webSocket = new WebSocketChannelImpl();
         } else {
-             webSocket = new WebSocketChannelImpl(channelName, manager);
+             webSocket = new WebSocketChannelImpl(url, manager);
         }
-        webSockets.put(channelName, webSocket);
+        webSockets.put(url, webSocket);
         
         return webSocket;
     }
@@ -86,33 +86,34 @@ public class WebSocketChannelFactoryImpl implements  WebSocketChannelFactory {
     
     
     /**
-     * Register an event listener for a socket name.
+     * Register an event listener for a URL.
      * 
-     * @param channelName    Name of the socket to listen to.
+     * @param url    URL of the socket to listen to.
      * @param listener      Listener instance.
      **/
-    public void listenTo(String channelName, WebSocketEventListener listener) {
-        if (channelName.contains("*")) {
+    public void listenTo(String url, WebSocketEventListener listener) {
+        if (url.contains("*")) {
+            String urlPattern = url.replace("*", ".*");
             for (Map.Entry<String, WebSocketChannelImpl> entry : webSockets.entrySet()) {
-                if (entry.getKey().matches(channelName.replace("*", ".*"))) {
+                if (entry.getKey().matches(urlPattern)) {
                     entry.getValue().addListener(listener);
                 }
             }
-            addLazyListener(channelName, listener);
+            addLazyListener(url, listener);
         } else {
-            WebSocketChannelImpl webSocket = get(channelName);
+            WebSocketChannelImpl webSocket = get(url);
             if (webSocket == null) {
-                addLazyListener(channelName, listener);
+                addLazyListener(url, listener);
             }
             webSocket.addListener(listener);
         }
     }
 
-    private void addLazyListener(String channelName, WebSocketEventListener listener) {
-        List<WebSocketEventListener> listeners = lazyListeners.get(channelName);
+    private void addLazyListener(String url, WebSocketEventListener listener) {
+        List<WebSocketEventListener> listeners = lazyListeners.get(url);
         if(listeners == null) {
             listeners = new ArrayList<WebSocketEventListener>();
-            lazyListeners.put(channelName, listeners);
+            lazyListeners.put(url, listeners);
         }
         listeners.add(listener);
     }
@@ -126,14 +127,14 @@ public class WebSocketChannelFactoryImpl implements  WebSocketChannelFactory {
      **/
     public void addWebSocketManagerFromAttribute(String attributeName, Object attributeValue) {
         if (attributeValue instanceof WebSocketManager) {
-            String channelName = attributeName.substring(WebSocketManagerRepository.ATTRIBUTE_PREFIX.length());
-            WebSocketChannelImpl websocket = webSockets.get(channelName);
+            String url = attributeName.substring(WebSocketManagerRepository.ATTRIBUTE_PREFIX.length());
+            WebSocketChannelImpl websocket = webSockets.get(url);
             if (websocket != null) {
-                websocket.initialize(channelName, (WebSocketManager) attributeValue);
+                websocket.initialize(url, (WebSocketManager) attributeValue);
             } else {
-                WebSocketChannelImpl webSocket = new WebSocketChannelImpl(channelName, (WebSocketManager) attributeValue);
-                webSockets.put(channelName, webSocket);
-                addLazyListeners(channelName, webSocket);
+                WebSocketChannelImpl webSocket = new WebSocketChannelImpl(url, (WebSocketManager) attributeValue);
+                webSockets.put(url, webSocket);
+                addLazyListeners(url, webSocket);
             }
         }
     }
@@ -144,11 +145,11 @@ public class WebSocketChannelFactoryImpl implements  WebSocketChannelFactory {
      * @param name      Name of the WebSocket
      * @param webSocket WebSocket object.
      **/
-    private void addLazyListeners(String name, WebSocketChannelImpl webSocket) {
+    private void addLazyListeners(String url, WebSocketChannelImpl webSocket) {
         for (Map.Entry<String, List<WebSocketEventListener>> entry : lazyListeners.entrySet()) {
             boolean hasWildcard = isWildcardName(entry.getKey());
-            String filter = entry.getKey().replace("*", ".*");
-            if (name.matches(filter)) {
+            String urlPattern = entry.getKey().replace("*", ".*");
+            if (url.matches(urlPattern)) {
                 Set<WebSocketEventListener> toRemove = new HashSet<WebSocketEventListener>();
                 for (WebSocketEventListener listener : entry.getValue()) {
                     webSocket.addListener(listener);

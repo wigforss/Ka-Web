@@ -10,13 +10,20 @@
 	<distributable/>
 
     <!-- Spring 3 Configuration -->
-    <!-- 
-    <context-param>
+    <!--
+	<context-param>
         <param-name>contextConfigLocation</param-name>
         <param-value>/WEB-INF/spring/application-context.xml</param-value>
     </context-param>
-    -->
-    <!--  
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+
+ -->   
+    
+    
+    
+<!--      
 	<context-param>
 		<param-name>webSocketConfigLocation</param-name>
 		<param-value>/WEB-INF/websocket-config.xml</param-value>
@@ -25,13 +32,7 @@
 		<listener-class>org.kasource.web.websocket.bootstrap.WebSocketConfigListener</listener-class>
 	</listener>
 -->
-<!--  
-    <listener>
-        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
-    </listener>
--->
-    
-    <servlet>
+	<servlet>
         <servlet-name>chatServer</servlet-name>
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
@@ -50,14 +51,6 @@
     <!-- <servlet-class>org.kasource.web.websocket.impl.jetty.JettyWebSocketImpl</servlet-class> -->
     <servlet-class>org.kasource.web.websocket.impl.tomcat.TomcatWebsocketImpl</servlet-class>
     <load-on-startup>2</load-on-startup>
-    <init-param>
-    	<param-name>dynamicAddressing</param-name>
-    	<param-value>true</param-value>
-    </init-param>
-    <init-param>
-    	<param-name>text.default.protocolHandler</param-name>
-    	<param-value>org.kasource.web.websocket.protocol.XmlProtocolHandler</param-value>
-    </init-param>
   </servlet>
   
   <servlet-mapping>

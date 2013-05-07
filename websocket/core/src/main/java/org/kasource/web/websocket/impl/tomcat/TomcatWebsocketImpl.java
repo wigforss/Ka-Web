@@ -10,10 +10,10 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.catalina.websocket.StreamInbound;
 import org.apache.catalina.websocket.WebSocketServlet;
-import org.kasource.web.websocket.bootstrap.WebSocketConfigListener;
-import org.kasource.web.websocket.config.WebSocketConfig;
+import org.kasource.web.websocket.client.WebSocketClientConfig;
+import org.kasource.web.websocket.config.WebSocketServletConfig;
 import org.kasource.web.websocket.manager.WebSocketManager;
-import org.kasource.web.websocket.protocol.ProtocolHandlerRepository;
+import org.kasource.web.websocket.security.AuthenticationException;
 import org.kasource.web.websocket.util.ServletConfigUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +26,8 @@ public class TomcatWebsocketImpl extends WebSocketServlet {
     private static final Logger LOG = LoggerFactory.getLogger(TomcatWebsocketImpl.class);
    
     private ServletConfigUtil configUtil; 
-    private WebSocketConfig webSocketConfig;
+    private WebSocketServletConfig webSocketServletConfig;
+ 
     private int outboundByteBufferSize;
 
     private int outboundCharBufferSize;
@@ -36,21 +37,18 @@ public class TomcatWebsocketImpl extends WebSocketServlet {
     public void init() throws ServletException {
         super.init();
         configUtil = new ServletConfigUtil(getServletConfig());
-        webSocketConfig = configUtil.getAttributeByClass(WebSocketConfig.class);
-        if(webSocketConfig == null) {         
-            ServletException ex = new ServletException("Could not loacate websocket configuration as ServletContext attribute, make sure to configure " 
-                        + WebSocketConfigListener.class + " as listener in web.xml or use the Spring, Guice or CDI extension.");
-            LOG.error("Could not loacate websocket configuration as ServletContext attribute", ex);
-            throw ex;
-        }
+        webSocketServletConfig = configUtil.getConfiguration();
+     
+        
         outboundByteBufferSize = configUtil.parseInitParamAsInt("outboundByteBufferSize");
         outboundCharBufferSize = configUtil.parseInitParamAsInt("outboundCharBufferSize");
        
-        configUtil.validateMapping(webSocketConfig.isDynamicAddressing());
-        if(!webSocketConfig.isDynamicAddressing()) {
-            webSocketConfig.getManagerRepository().getWebSocketManager(configUtil.getMaping());
+        configUtil.validateMapping(webSocketServletConfig.isDynamicAddressing());
+        if(!webSocketServletConfig.isDynamicAddressing()) {
+            webSocketServletConfig.getWebSocketManager(configUtil.getMaping());
            
         } 
+        LOG.info("Initialization completed.");
     }
 
   
@@ -58,31 +56,42 @@ public class TomcatWebsocketImpl extends WebSocketServlet {
 
     @Override
     protected StreamInbound createWebSocketInbound(String subProtocol, HttpServletRequest request) {
-        String managerName = configUtil.getMaping();
+        
+            String url = configUtil.getMaping();
        
-        if(webSocketConfig.isDynamicAddressing()) {
-            managerName = request.getRequestURI().substring(request.getContextPath().length());
-        }
+            if(webSocketServletConfig.isDynamicAddressing()) {
+                url = request.getRequestURI().substring(request.getContextPath().length());
+            }
        
-        WebSocketManager manager =   webSocketConfig.getManagerRepository().getWebSocketManager(managerName);
+            WebSocketManager manager =   webSocketServletConfig.getWebSocketManager(url);
+            String username = null;
+            try {
+                 username = manager.authenticate(request);
+            } catch (AuthenticationException e) {
+                LOG.error("Unauthorized access for " + request.getRemoteHost(), e);
+                throw e;
+            }
         
-        String username = manager.authenticate(request);
-     
+            String id = webSocketServletConfig.getClientIdGenerator().getId(request, manager);
+            WebSocketClientConfig clientConfig = new WebSocketClientConfig.Builder(manager)
+                                                    .url(url)
+                                                    .clientId(id)
+                                                    .username(username)
+                                                    .connectionParams(request.getParameterMap())
+                                                    .subProtocol(subProtocol)
+                                                    .build();
+            TomcatWebSocketClient client = new TomcatWebSocketClient(clientConfig);
+   
         
-        String id = webSocketConfig.getClientIdGenerator().getId(request, manager);
-        TomcatWebSocketClient client = new TomcatWebSocketClient(manager, username, id, request.getParameterMap());
-        ProtocolHandlerRepository protocols = webSocketConfig.getProtocolHandlerRepository();
-        client.setBinaryProtocol(protocols.getBinaryProtocol(subProtocol, true));
-        client.setTextProtocol(protocols.getTextProtocol(subProtocol, true));
-     
+            if (outboundByteBufferSize != 0) {
+                client.setOutboundByteBufferSize(outboundByteBufferSize);
+            }
+            if (outboundCharBufferSize != 0) {
+                client.setOutboundCharBufferSize(outboundCharBufferSize);
+            }
+            LOG.info("Client connecion created for " + request.getRemoteHost() + " with username " + username + " and ID " + id + " on " + url);
+            return client;
         
-        if (outboundByteBufferSize != 0) {
-            client.setOutboundByteBufferSize(outboundByteBufferSize);
-        }
-        if (outboundCharBufferSize != 0) {
-            client.setOutboundCharBufferSize(outboundCharBufferSize);
-        }
-        return client;
     }
     
     
@@ -104,21 +113,20 @@ public class TomcatWebsocketImpl extends WebSocketServlet {
      */
     @Override
     protected boolean verifyOrigin(String origin) {
-        if(origin == null) {
-            return false;
-        }
-        if(!webSocketConfig.getOrginWhitelist().isEmpty()) {
-            return webSocketConfig.getOrginWhitelist().contains(origin);
-        }
-        return true;
+        boolean validOrigin = webSocketServletConfig.isValidOrigin(origin);;
+        LOG.warn("Invalid origin: " + origin +" in connection attempt");
+        return validOrigin;
+        
     }
     
     protected String selectSubProtocol(List<String> subProtocols) {     
         for (String clientProtocol : subProtocols) {
-            if(webSocketConfig.getProtocolHandlerRepository().hasProtocol(clientProtocol)) {
+            if(webSocketServletConfig.hasProtocol(clientProtocol, configUtil.getMaping())) {
+                LOG.info("Requested protocol "+ clientProtocol + " found by server");
                 return clientProtocol;
             }
         }
+        LOG.info("Protocols " + subProtocols + " requested by client, but no such protocols found on server.");
         return null;
     }
 }

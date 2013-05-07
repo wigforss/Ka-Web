@@ -29,18 +29,18 @@ public interface WebSocketChannelFactory {
     public void initialize(ServletContext servletContext) throws Exception;
     
     /**
-     * Returns the WebSocketChannel that matches the supplied name.
+     * Returns the WebSocketChannel that matches the supplied URL.
      * 
      * If no such WebSocketChannel can be found a new instance will be
      * returned which will be lazily initialized once a connection is established 
      * to a web socket with that name.
      * 
      * 
-     * @param socketChannelName Name of the WebSocketChannel to locate.
+     * @param url URL of the WebSocketChannel to locate.
      * 
-     * @return The WebSocketChannel with the matching name.
+     * @return The WebSocketChannel with the matching URL.
      **/
-    public WebSocketChannel get(String socketChannelName);
+    public WebSocketChannel get(String url);
   
     /**
      * Register a listener to a channel.
@@ -49,8 +49,8 @@ public interface WebSocketChannelFactory {
      * will allow for lazy registration once a web socket channel becomes 
      * available which matches to wild card expression.
      * 
-     * @param socketChannelName Name of the web socket channel to register on.
+     * @param url               URL of the web socket channel to register on.
      * @param listener          Listener instance.
      **/
-    public void listenTo(String socketChannelName, WebSocketEventListener listener) ;
+    public void listenTo(String url, WebSocketEventListener listener) ;
 }

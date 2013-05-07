@@ -8,7 +8,7 @@ import java.io.Reader;
 import java.util.Map;
 
 import org.kasource.web.websocket.client.WebSocketClient;
-import org.kasource.web.websocket.manager.WebSocketManager;
+import org.kasource.web.websocket.client.WebSocketClientConfig;
 import org.kasource.web.websocket.protocol.ProtocolHandler;
 import org.kasource.web.websocket.util.IoUtils;
 
@@ -16,20 +16,14 @@ import com.caucho.websocket.WebSocketContext;
 import com.caucho.websocket.WebSocketListener;
 
 public class ResinWebSocketClient implements WebSocketListener, WebSocketClient  {
-    private String username;
-    private WebSocketManager manager;
-    private String id;
-    private WebSocketContext context;
-    private Map<String, String[]> connectionParameters;
+    private  WebSocketClientConfig clientConfig;
     private IoUtils ioUtils = new IoUtils();
-    private ProtocolHandler<String> textProtocol;
-    private ProtocolHandler<byte[]> binaryProtocol;
+    private WebSocketContext context;
+    private ProtocolHandler<String> textProtocolHandler;
+    private ProtocolHandler<byte[]> binaryProtocolHandler;
     
-    public ResinWebSocketClient(WebSocketManager manager, String username, String clientId, Map<String, String[]> connectionParameters) {
-        this.username = username;
-        this.id = clientId;
-        this.manager = manager;
-        this.connectionParameters = connectionParameters;
+    public ResinWebSocketClient(WebSocketClientConfig clientConfig) {
+       this.clientConfig = clientConfig;
     }
 
 
@@ -43,14 +37,14 @@ public class ResinWebSocketClient implements WebSocketListener, WebSocketClient 
 
     @Override
     public void onDisconnect(WebSocketContext context) throws IOException {
-        manager.unregisterClient(this);
+        clientConfig.getManager().unregisterClient(this);
     }
 
 
 
     @Override
     public void onReadBinary(WebSocketContext context, InputStream in) throws IOException {
-        manager.onWebSocketMessage(this, ioUtils.toByteArray(in), binaryProtocol);
+        clientConfig.getManager().onWebSocketMessage(this, ioUtils.toByteArray(in));
        
 
     }
@@ -59,7 +53,7 @@ public class ResinWebSocketClient implements WebSocketListener, WebSocketClient 
 
     @Override
     public void onReadText(WebSocketContext context, Reader reader) throws IOException {
-        manager.onWebSocketMessage(this, ioUtils.readString(reader), textProtocol);
+        clientConfig.getManager().onWebSocketMessage(this, ioUtils.readString(reader));
 
     }
 
@@ -68,7 +62,7 @@ public class ResinWebSocketClient implements WebSocketListener, WebSocketClient 
     @Override
     public void onStart(WebSocketContext context) throws IOException {
         this.context = context;
-        manager.registerClient(this);
+        clientConfig.getManager().registerClient(this);
     }
 
 
@@ -117,27 +111,14 @@ public class ResinWebSocketClient implements WebSocketListener, WebSocketClient 
         
     }
 
-    /**
-     * @param textProtocol the textProtocol to set
-     */
-    public void setTextProtocol(ProtocolHandler<String> textProtocol) {
-        this.textProtocol = textProtocol;
-    }
-
-
-    /**
-     * @param binaryProtocol the binaryProtocol to set
-     */
-    public void setBinaryProtocol(ProtocolHandler<byte[]> binaryProtocol) {
-        this.binaryProtocol = binaryProtocol;
-    }
+   
 
     /**
      * @return the username
      */
     @Override
     public String getUsername() {
-        return username;
+        return clientConfig.getUsername();
     }
 
 
@@ -147,7 +128,7 @@ public class ResinWebSocketClient implements WebSocketListener, WebSocketClient 
      */
     @Override
     public Map<String, String[]> getConnectionParameters() {
-        return connectionParameters;
+        return clientConfig.getConnectionParameters();
     }
 
 
@@ -157,7 +138,55 @@ public class ResinWebSocketClient implements WebSocketListener, WebSocketClient 
      */
     @Override
     public String getId() {
-        return id;
+        return clientConfig.getClientId();
+    }
+    
+    @Override
+    public String getUrl() {
+        return clientConfig.getUrl();
+    }
+    
+    @Override
+    public String getSubProtocol() {
+        return clientConfig.getSubProtocol();
+    }
+
+    /**
+     * @return the textProtocolHandler
+     */
+    @Override
+    public ProtocolHandler<String> getTextProtocolHandler() {
+        return textProtocolHandler;
+    }
+
+
+
+    /**
+     * @param textProtocolHandler the textProtocolHandler to set
+     */
+    @Override
+    public void setTextProtocolHandler(ProtocolHandler<String> textProtocolHandler) {
+        this.textProtocolHandler = textProtocolHandler;
+    }
+
+
+
+    /**
+     * @return the binaryProtocolHandler
+     */
+    @Override
+    public ProtocolHandler<byte[]> getBinaryProtocolHandler() {
+        return binaryProtocolHandler;
+    }
+
+
+
+    /**
+     * @param binaryProtocolHandler the binaryProtocolHandler to set
+     */
+    @Override
+    public void setBinaryProtocolHandler(ProtocolHandler<byte[]> binaryProtocolHandler) {
+        this.binaryProtocolHandler = binaryProtocolHandler;
     }
 
 

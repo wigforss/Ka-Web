@@ -10,13 +10,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.kasource.web.websocket.bootstrap.WebSocketConfigListener;
-import org.kasource.web.websocket.config.WebSocketConfig;
+import org.kasource.web.websocket.client.WebSocketClientConfig;
+import org.kasource.web.websocket.config.WebSocketServletConfig;
 import org.kasource.web.websocket.manager.WebSocketManager;
+import org.kasource.web.websocket.security.AuthenticationException;
 import org.kasource.web.websocket.util.ServletConfigUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 import com.caucho.websocket.WebSocketListener;
 import com.caucho.websocket.WebSocketServletRequest;
@@ -29,26 +29,22 @@ public class ResinWebSocketImpl extends HttpServlet {
    
 
     private ServletConfigUtil configUtil; 
-    private WebSocketConfig webSocketConfig;
    
+    private WebSocketServletConfig webSocketServletConfig;
 
 
     @Override
     public void init() throws ServletException {
         super.init();
         configUtil = new ServletConfigUtil(getServletConfig());
-        webSocketConfig = configUtil.getAttributeByClass(WebSocketConfig.class);
-        if(webSocketConfig == null) {         
-            ServletException ex = new ServletException("Could not loacate websocket configuration as ServletContext attribute, make sure to configure " 
-                        + WebSocketConfigListener.class + " as listener in web.xml or use the Spring, Guice or CDI extension.");
-            LOG.error("Could not loacate websocket configuration as ServletContext attribute", ex);
-            throw ex;
+        webSocketServletConfig = configUtil.getConfiguration();
+       
+       
+        configUtil.validateMapping(webSocketServletConfig.isDynamicAddressing());
+        if(!webSocketServletConfig.isDynamicAddressing()) {
+            webSocketServletConfig.getWebSocketManager(configUtil.getMaping());
         }
-        
-        configUtil.validateMapping(webSocketConfig.isDynamicAddressing());
-        if(!webSocketConfig.isDynamicAddressing()) {
-            webSocketConfig.getManagerRepository().getWebSocketManager(configUtil.getMaping());
-        }
+        LOG.info("Initialization completed.");
     }
 
    
@@ -79,7 +75,7 @@ public class ResinWebSocketImpl extends HttpServlet {
 
     private String selectSubProtocol(String[] subProtocols) {
         for (String clientProtocol : subProtocols) {
-            if(webSocketConfig.getProtocolHandlerRepository().hasProtocol(clientProtocol)) {
+            if(webSocketServletConfig.hasProtocol(clientProtocol, configUtil.getMaping())) {
                 return clientProtocol;
             }
         }
@@ -89,29 +85,38 @@ public class ResinWebSocketImpl extends HttpServlet {
 
 
     private boolean validOrigin(String origin) {
-        if (origin == null) {
-            return false;
-        }
-        if (!webSocketConfig.getOrginWhitelist().isEmpty()) {
-            return webSocketConfig.getOrginWhitelist().contains(origin);
-        }
-        return true;
+        boolean validOrigin = webSocketServletConfig.isValidOrigin(origin);;
+        LOG.warn("Invalid origin: " + origin +" in connection attempt");
+        return validOrigin;
     }
 
 
 
     private WebSocketListener createClient(HttpServletRequest request, String protocol) {
-        String managerName = configUtil.getMaping();
+        String url = configUtil.getMaping();
         
-        if(webSocketConfig.isDynamicAddressing()) {
-            managerName = request.getRequestURI().substring(request.getContextPath().length());
+        if(webSocketServletConfig.isDynamicAddressing()) {
+            url = request.getRequestURI().substring(request.getContextPath().length());
         }
-        WebSocketManager manager = webSocketConfig.getManagerRepository().getWebSocketManager(managerName);
-        String username = manager.authenticate(request);
-        String id = webSocketConfig.getClientIdGenerator().getId(request, manager);
-        ResinWebSocketClient client = new ResinWebSocketClient(manager, username, id, request.getParameterMap());
-        client.setBinaryProtocol(webSocketConfig.getProtocolHandlerRepository().getBinaryProtocol(protocol, true));
-        client.setTextProtocol(webSocketConfig.getProtocolHandlerRepository().getTextProtocol(protocol, true));
+        WebSocketManager manager = webSocketServletConfig.getWebSocketManager(url);
+        String username = null;
+        try {
+             username = manager.authenticate(request);
+        } catch (AuthenticationException e) {
+            LOG.error("Unauthorized access for " + request.getRemoteHost(), e);
+            throw e;
+        }
+        String id = webSocketServletConfig.getClientIdGenerator().getId(request, manager);
+        WebSocketClientConfig clientConfig = new WebSocketClientConfig.Builder(manager)
+                                                .url(url)
+                                                .clientId(id)
+                                                .username(username)
+                                                .connectionParams(request.getParameterMap())
+                                                .subProtocol(protocol)
+                                                .build();
+        
+        ResinWebSocketClient client = new ResinWebSocketClient(clientConfig);
+        LOG.info("Client connecion created for " + request.getRemoteHost() + " with username " + username + " and ID " + id + " on " + url);
         return client;
     }
 

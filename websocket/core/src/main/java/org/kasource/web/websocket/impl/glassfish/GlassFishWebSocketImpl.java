@@ -5,8 +5,6 @@ import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 
-
-
 import com.sun.grizzly.websockets.WebSocketEngine;
 
 

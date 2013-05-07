@@ -1,21 +1,17 @@
 package org.kasource.web.websocket.spring.config.springns;
-import static org.kasource.web.websocket.spring.config.springns.WebSocketXmlNamespaceHandler.AUTHENTICATION_CONFIG_ID;
-import static org.kasource.web.websocket.spring.config.springns.WebSocketXmlNamespaceHandler.BINARY_PROTOCOLS_CONFIG_ID;
 import static org.kasource.web.websocket.spring.config.springns.WebSocketXmlNamespaceHandler.CHANNEL_FACTORY_ID;
 import static org.kasource.web.websocket.spring.config.springns.WebSocketXmlNamespaceHandler.CONFIGURER_ID;
 import static org.kasource.web.websocket.spring.config.springns.WebSocketXmlNamespaceHandler.CONFIG_ID;
 import static org.kasource.web.websocket.spring.config.springns.WebSocketXmlNamespaceHandler.MANAGER_REPO_ID;
 import static org.kasource.web.websocket.spring.config.springns.WebSocketXmlNamespaceHandler.POST_BEAN_PROCESSOR_ID;
 import static org.kasource.web.websocket.spring.config.springns.WebSocketXmlNamespaceHandler.PROTOCOL_REPO_ID;
-import static org.kasource.web.websocket.spring.config.springns.WebSocketXmlNamespaceHandler.TEXT_PROTOCOLS_CONFIG_ID;
 
-import org.kasource.web.websocket.protocol.ProtocolHandlerRepositoryImpl;
 import org.kasource.web.websocket.spring.channel.SpringWebSocketChannelFactory;
-import org.kasource.web.websocket.spring.config.SpringWebSocketConfig;
+import org.kasource.web.websocket.spring.config.SpringWebSocketConfigFactoryBean;
 import org.kasource.web.websocket.spring.config.SpringWebSocketConfigurer;
-import org.kasource.web.websocket.spring.manager.SpringWebSocketManagerRepository;
+import org.kasource.web.websocket.spring.manager.WebSocketManagerRepositoryFactoryBean;
+import org.kasource.web.websocket.spring.protocol.ProtocolHandlerRepositoryFactoryBean;
 import org.kasource.web.websocket.spring.registration.WebSocketListenerPostBeanProcessor;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.parsing.BeanComponentDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
@@ -46,17 +42,12 @@ public class ConfigurerBeanDefinitionParser extends AbstractSingleBeanDefinition
     protected void doParse(Element element, ParserContext pc,
             BeanDefinitionBuilder bean) {
         element.setAttribute(ID_ATTRIBUTE, CONFIGURER_ID);
-        bean.addPropertyValue("dynamicAddressing", element
-                .getAttribute("dynamicAddressing"));
-        if(element.getAttribute("clientIdGeneratorRef") != null) {
-            String ref = element.getAttribute("clientIdGeneratorRef");
-            bean.addPropertyReference("clientIdGenerator", ref);
-        }
-        bean.addConstructorArgReference(CONFIG_ID);
+        bean.addPropertyReference("channelFactory", CHANNEL_FACTORY_ID);
         bean.setInitMethodName("configure");
+        bean.addConstructorArgReference(CONFIG_ID);
         bean.setLazyInit(false);
       
-        createBeans(pc);
+        createBeans(pc, element);
 
     }
     
@@ -65,33 +56,19 @@ public class ConfigurerBeanDefinitionParser extends AbstractSingleBeanDefinition
      * 
      * @param pc           Parser Context.
      **/
-    private void createBeans(ParserContext pc) {
+    private void createBeans(ParserContext pc, Element element) {
         createProtocolRepository(pc);
         createManagerRepository(pc);
         createChannelFactory(pc);
         createPostBeanProcessor(pc);
-        createConfig(pc);
+        createConfig(pc, element);
     }
     
     private void createProtocolRepository(ParserContext pc) {
         BeanDefinitionBuilder builder = BeanDefinitionBuilder
                 .rootBeanDefinition(
-        ProtocolHandlerRepositoryImpl.class);
+                            ProtocolHandlerRepositoryFactoryBean.class);
         builder.setLazyInit(false);
-        
-        try {
-            pc.getRegistry().getBeanDefinition(TEXT_PROTOCOLS_CONFIG_ID);
-            builder.addPropertyReference("textProtocolHandlerConfig", TEXT_PROTOCOLS_CONFIG_ID);
-        } catch(NoSuchBeanDefinitionException nsbde) {
-            // Ignore
-        }
-        
-        try {
-            pc.getRegistry().getBeanDefinition(BINARY_PROTOCOLS_CONFIG_ID);
-            builder.addPropertyReference("binaryProtocolHandlerConfig", BINARY_PROTOCOLS_CONFIG_ID);
-        } catch(NoSuchBeanDefinitionException nsbde) {
-            // Ignore
-        }
         
         
         pc.registerBeanComponent(new BeanComponentDefinition(builder
@@ -100,27 +77,29 @@ public class ConfigurerBeanDefinitionParser extends AbstractSingleBeanDefinition
     
     private void createManagerRepository(ParserContext pc) {
         BeanDefinitionBuilder builder = BeanDefinitionBuilder
-            .rootBeanDefinition(SpringWebSocketManagerRepository.class);
-        
-        try {
-            pc.getRegistry().getBeanDefinition(AUTHENTICATION_CONFIG_ID);
-            builder.addPropertyReference("authenticationConfig", AUTHENTICATION_CONFIG_ID);
-        } catch(NoSuchBeanDefinitionException nsbde) {
-            // Ignore
-        }
-       
+            .rootBeanDefinition(WebSocketManagerRepositoryFactoryBean.class);
        
         builder.setLazyInit(false);
         pc.registerBeanComponent(new BeanComponentDefinition(builder
             .getBeanDefinition(), MANAGER_REPO_ID));
     }
     
-    private void createConfig(ParserContext pc) {
+    private void createConfig(ParserContext pc, Element element) {
         BeanDefinitionBuilder builder = BeanDefinitionBuilder
-            .rootBeanDefinition(SpringWebSocketConfig.class);
+            .rootBeanDefinition(SpringWebSocketConfigFactoryBean.class);
         builder.addPropertyReference("channelFactory", CHANNEL_FACTORY_ID);
         builder.addPropertyReference("managerRepository", MANAGER_REPO_ID);
+        builder.addPropertyReference("protocolHandlerRepository", PROTOCOL_REPO_ID);
         builder.setLazyInit(false);
+        
+       
+        if(element.getAttribute("clientIdGeneratorRef") != null) {
+             String ref = element.getAttribute("clientIdGeneratorRef");
+             builder.addPropertyReference("clientIdGenerator", ref);
+        }
+            
+        
+        
         pc.registerBeanComponent(new BeanComponentDefinition(builder
             .getBeanDefinition(), CONFIG_ID));
     }

@@ -10,9 +10,15 @@ package org.kasource.web.websocket.config.xml.jaxb;
 
 
 
+
+
+
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
@@ -27,13 +33,13 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
+ *         &lt;element ref="{http://kasource.org/schema/websocket}websocket" maxOccurs="unbounded"/>
  *         &lt;element ref="{http://kasource.org/schema/websocket}orginWhitelist" minOccurs="0"/>
+ *         &lt;element ref="{http://kasource.org/schema/websocket}clientIdGenerator" minOccurs="0"/>
  *         &lt;element ref="{http://kasource.org/schema/websocket}authentication" minOccurs="0"/>
  *         &lt;element ref="{http://kasource.org/schema/websocket}textProtocolHandler" minOccurs="0"/>
  *         &lt;element ref="{http://kasource.org/schema/websocket}binaryProtocolHandler" minOccurs="0"/>
  *       &lt;/sequence>
- *       &lt;attribute name="dynamicAddressing" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" />
- *       &lt;attribute name="clientIdGeneratorClass" type="{http://www.w3.org/2001/XMLSchema}string" use="optional" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -43,6 +49,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
+    "websocket",
     "orginWhitelist",
     "clientIdGenerator",
     "authentication",
@@ -52,14 +59,43 @@ import javax.xml.bind.annotation.XmlType;
 @XmlRootElement(name = "websocket-config")
 public class WebsocketXmlConfigRoot  {
 
+
+    @XmlElement(required = true)
+    protected List<WebsocketXml> websocket;
     protected OrginWhitelistXmlConfig orginWhitelist;
     protected ClientIdGeneratorXmlConfig clientIdGenerator;
     protected AuthenticationXmlConfig authentication;
     protected ProtocolHandlerXmlConfig textProtocolHandler;
     protected ProtocolHandlerXmlConfig binaryProtocolHandler;
-    @XmlAttribute
-    protected boolean dynamicAddressing;
-
+  
+    /**
+     * Gets the value of the websocket property.
+     * 
+     * <p>
+     * This accessor method returns a reference to the live list,
+     * not a snapshot. Therefore any modification you make to the
+     * returned list will be present inside the JAXB object.
+     * This is why there is not a <CODE>set</CODE> method for the websocket property.
+     * 
+     * <p>
+     * For example, to add a new item, do as follows:
+     * <pre>
+     *    getWebsocket().add(newItem);
+     * </pre>
+     * 
+     * 
+     * <p>
+     * Objects of the following type(s) are allowed in the list
+     * {@link Websocket }
+     * 
+     * 
+     */
+    public List<WebsocketXml> getWebsocket() {
+        if (websocket == null) {
+            websocket = new ArrayList<WebsocketXml>();
+        }
+        return this.websocket;
+    }
 
     /**
      * Gets the value of the orginWhitelist property.
@@ -157,31 +193,7 @@ public class WebsocketXmlConfigRoot  {
         this.binaryProtocolHandler = value;
     }
 
-    /**
-     * Gets the value of the dynamicAddressing property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
-     */
-    public boolean isDynamicAddressing() {
-        
-        return dynamicAddressing;
-        
-    }
-
-    /**
-     * Sets the value of the dynamicAddressing property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link boolean }
-     *     
-     */
-    public void setDynamicAddressing(boolean value) {
-        this.dynamicAddressing = value;
-    }
+    
 
   
 

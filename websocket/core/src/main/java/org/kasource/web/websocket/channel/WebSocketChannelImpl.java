@@ -30,7 +30,7 @@ import org.kasource.web.websocket.protocol.XmlProtocolHandler;
  * @author rikardwi
  **/
 public class WebSocketChannelImpl implements WebSocketChannel, ClientListener {
-    private String channelName;
+    private String url;
     private WebsocketMessageSender sender;
     private TextProtocolHandler json = new JsonProtocolHandler();
     private TextProtocolHandler jaxb = new XmlProtocolHandler();
@@ -51,8 +51,8 @@ public class WebSocketChannelImpl implements WebSocketChannel, ClientListener {
      * 
      * @param sender WebSocket manager used to send messages with.
      **/
-    public WebSocketChannelImpl(String socketName, WebSocketManager sender) { 
-        initialize(socketName, sender);
+    public WebSocketChannelImpl(String url, WebSocketManager sender) { 
+        initialize(url, sender);
     }
     
    
@@ -62,8 +62,8 @@ public class WebSocketChannelImpl implements WebSocketChannel, ClientListener {
      * 
      * @param manager WebSocketManager to use.
      */
-    public void initialize(String socketName, WebSocketManager manager) {
-        this.channelName = socketName;
+    public void initialize(String url, WebSocketManager manager) {
+        this.url = url;
         this.sender = manager;
         manager.addClientListener(this);
     }
@@ -225,8 +225,9 @@ public class WebSocketChannelImpl implements WebSocketChannel, ClientListener {
      * 
      * @return name of this web socket channel.
      */
-    public String getName() {
-        return channelName;
+    @Override
+    public String getUrl() {
+        return url;
     }
 
     /**

@@ -1,59 +1,64 @@
 package org.kasource.web.websocket.spring.config;
 
-import org.kasource.web.websocket.client.id.ClientIdGenerator;
-import org.kasource.web.websocket.client.id.DefaultClientIdGenerator;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletContextAttributeEvent;
+import javax.servlet.ServletContextAttributeListener;
 
-public class SpringWebSocketConfigurer implements ApplicationContextAware {
-    private ApplicationContext applicationContext;
-    private SpringWebSocketConfig config;
-    private boolean dynamicAddressing;
-    private ClientIdGenerator clientIdGenerator;
+import org.kasource.web.websocket.channel.WebSocketChannelFactory;
+import org.kasource.web.websocket.config.WebSocketConfig;
+import org.springframework.beans.factory.annotation.Required;
+import org.springframework.web.context.ServletContextAware;
+
+public class SpringWebSocketConfigurer implements ServletContextAware, ServletContextAttributeListener  {
+
     
-    public SpringWebSocketConfigurer(SpringWebSocketConfig config) {
-        this.config = config;
+    private ServletContext servletContext;
+    private WebSocketChannelFactory channelFactory;
+    private WebSocketConfig webSocketConfig;
+    
+    public SpringWebSocketConfigurer(WebSocketConfig webSocketConfig) {
+         this.webSocketConfig = webSocketConfig;
     }
     
     public void configure() {
-        if(clientIdGenerator != null) {
-            config.setClientIdGenerator(clientIdGenerator);
-        }
-        config.setDynamicAddressing(dynamicAddressing);
-        config.initialize();
+        
+        servletContext.addListener(this);
+        servletContext.setAttribute(WebSocketConfig.class.getName(), webSocketConfig);
     }
 
+ 
   
-    
-    
-    
     @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.applicationContext = applicationContext;
+    public void setServletContext(ServletContext servletContext) {
+       this.servletContext = servletContext;
+        
+    }
+
+    @Override
+    public void attributeAdded(ServletContextAttributeEvent event) {
+        channelFactory.addWebSocketManagerFromAttribute(event.getName(), event.getValue());
+        
+    }
+
+    @Override
+    public void attributeRemoved(ServletContextAttributeEvent event) {
+       
+        
+    }
+
+    @Override
+    public void attributeReplaced(ServletContextAttributeEvent event) {
+     
         
     }
 
     /**
-     * @return the dynamicAddressing
+     * @param channelFactory the channelFactory to set
      */
-    public boolean isDynamicAddressing() {
-        return dynamicAddressing;
-    }
+    @Required
+    public void setChannelFactory(WebSocketChannelFactory channelFactory) {
+        this.channelFactory = channelFactory;
+    }   
 
-    /**
-     * @param dynamicAddressing the dynamicAddressing to set
-     */
-    public void setDynamicAddressing(boolean dynamicAddressing) {
-        this.dynamicAddressing = dynamicAddressing;
-    }
-
-    /**
-     * @param clientIdGenerator the clientIdGenerator to set
-     */
-    public void setClientIdGenerator(ClientIdGenerator clientIdGenerator) {
-        this.clientIdGenerator = clientIdGenerator;
-    }
-
+   
 }

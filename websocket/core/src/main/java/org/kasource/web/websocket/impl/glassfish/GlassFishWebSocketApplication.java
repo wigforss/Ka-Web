@@ -6,9 +6,10 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
-import org.kasource.web.websocket.bootstrap.WebSocketConfigListener;
-import org.kasource.web.websocket.config.WebSocketConfig;
+import org.kasource.web.websocket.client.WebSocketClientConfig;
+import org.kasource.web.websocket.config.WebSocketServletConfig;
 import org.kasource.web.websocket.manager.WebSocketManager;
+import org.kasource.web.websocket.security.AuthenticationException;
 import org.kasource.web.websocket.util.ServletConfigUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,31 +29,26 @@ import com.sun.grizzly.websockets.WebSocketListener;
 public class GlassFishWebSocketApplication extends WebSocketApplication  {
     private static final Logger LOG = LoggerFactory.getLogger(GlassFishWebSocketApplication.class);
     private ServletConfigUtil configUtil; 
-    private WebSocketConfig webSocketConfig;
 
+    private WebSocketServletConfig webSocketServletConfig;
  
 
     public GlassFishWebSocketApplication(ServletConfig config) throws ServletException {
         this.configUtil = new ServletConfigUtil(config);
-        webSocketConfig = configUtil.getAttributeByClass(WebSocketConfig.class);
-        
-        if(webSocketConfig == null) {         
-            ServletException ex = new ServletException("Could not loacate websocket configuration as ServletContext attribute, make sure to configure " 
-                        + WebSocketConfigListener.class + " as listener in web.xml or use the Spring, Guice or CDI extension.");
-            LOG.error("Could not loacate websocket configuration as ServletContext attribute", ex);
-            throw ex;
-        }
-        
-        configUtil.validateMapping(webSocketConfig.isDynamicAddressing());
+        webSocketServletConfig = configUtil.getConfiguration();
+    
+     
+        configUtil.validateMapping(webSocketServletConfig.isDynamicAddressing());
         initialize();
+        LOG.info("Initialization completed.");
     }
  
     /**
      * initialize websocket application
      */
     private void initialize() {
-        if(!webSocketConfig.isDynamicAddressing()) {
-            webSocketConfig.getManagerRepository().getWebSocketManager(configUtil.getMaping());
+        if(!webSocketServletConfig.isDynamicAddressing()) {
+            webSocketServletConfig.getWebSocketManager(configUtil.getMaping());
         }
     }
     
@@ -66,17 +62,30 @@ public class GlassFishWebSocketApplication extends WebSocketApplication  {
             final Request requestPacket,
             final WebSocketListener... listeners) {
         HttpServletRequest request = new GrizzlyRequestWrapper(requestPacket);
-        String managerName = configUtil.getMaping();
-        if(webSocketConfig.isDynamicAddressing()) {
-            managerName = request.getRequestURI().substring(configUtil.getMaping().length());
-        }
-        WebSocketManager manager = webSocketConfig.getManagerRepository().getWebSocketManager(managerName);
-        String username = manager.authenticate(request);
-        String clientId = webSocketConfig.getClientIdGenerator().getId(request, manager);
+        String url = configUtil.getMaping();
        
-        GlassFishWebSocketClient client = new GlassFishWebSocketClient(manager, handler, listeners, username, clientId, request.getParameterMap());
-        client.setBinaryProtocol(webSocketConfig.getProtocolHandlerRepository().getBinaryProtocol(handler.toString(), true));
-        client.setTextProtocol(webSocketConfig.getProtocolHandlerRepository().getTextProtocol(handler.toString(), true));
+        if(webSocketServletConfig.isDynamicAddressing()) {
+            url = request.getRequestURI().substring(configUtil.getMaping().length());
+        }
+        
+        WebSocketManager manager = webSocketServletConfig.getWebSocketManager(url);
+        String username = null;
+        try {
+             username = manager.authenticate(request);
+        } catch (AuthenticationException e) {
+            LOG.error("Unauthorized access for " + request.getRemoteHost(), e);
+            throw e;
+        }
+        String clientId = webSocketServletConfig.getClientIdGenerator().getId(request, manager);
+        WebSocketClientConfig clientConfig = new WebSocketClientConfig.Builder(manager)
+                                                    .url(url)
+                                                    .clientId(clientId)
+                                                    .username(username)
+                                                    .connectionParams(request.getParameterMap())
+                                                    .subProtocol(handler.toString())
+                                                    .build();
+        GlassFishWebSocketClient client = new GlassFishWebSocketClient(handler, listeners, clientConfig);
+        LOG.info("Client connecion created for " + request.getRemoteHost() + " with username " + username + " and ID " + clientId + " on " + url);
         return client;
     }
    

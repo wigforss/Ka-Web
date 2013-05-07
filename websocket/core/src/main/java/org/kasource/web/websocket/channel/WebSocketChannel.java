@@ -94,5 +94,5 @@ public interface WebSocketChannel extends WebsocketMessageSender {
      * 
      * @return name of the web socket.
      **/
-    public String getName();
+    public String getUrl();
 }

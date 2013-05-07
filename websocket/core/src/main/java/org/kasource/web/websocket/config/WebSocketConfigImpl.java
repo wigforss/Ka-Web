@@ -1,11 +1,12 @@
 package org.kasource.web.websocket.config;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.kasource.web.websocket.channel.WebSocketChannelFactory;
-import org.kasource.web.websocket.client.id.ClientIdGenerator;
-import org.kasource.web.websocket.client.id.DefaultClientIdGenerator;
+
 import org.kasource.web.websocket.manager.WebSocketManagerRepository;
 import org.kasource.web.websocket.protocol.ProtocolHandlerRepository;
 import org.kasource.web.websocket.protocol.ProtocolHandlerRepositoryImpl;
@@ -15,17 +16,13 @@ public class WebSocketConfigImpl implements WebSocketConfig {
     
     private Set<String> orginWhitelist = new HashSet<String>();
     
-    private boolean dynamicAddressing;
-    
-    private ClientIdGenerator clientIdGenerator = new DefaultClientIdGenerator();
-    
-    private ProtocolHandlerRepository protocolHandlerRepository = new ProtocolHandlerRepositoryImpl(null, null);
+    private ProtocolHandlerRepository protocolHandlerRepository;
     
     private WebSocketManagerRepository managerRepository;
     
     private WebSocketChannelFactory channelFactory;
 
-    
+    private Map<String, WebSocketServletConfig> servletConfigs = new HashMap<String, WebSocketServletConfig>();
    
 
     /**
@@ -43,35 +40,9 @@ public class WebSocketConfigImpl implements WebSocketConfig {
         this.orginWhitelist = orginWhitelist;
     }
 
-    /**
-     * @return the dynamicAddressing
-     */
-    @Override
-    public boolean isDynamicAddressing() {
-        return dynamicAddressing;
-    }
+    
 
-    /**
-     * @param dynamicAddressing the dynamicAddressing to set
-     */
-    public void setDynamicAddressing(boolean dynamicAddressing) {
-        this.dynamicAddressing = dynamicAddressing;
-    }
-
-    /**
-     * @return the clientIdGenerator
-     */
-    @Override
-    public ClientIdGenerator getClientIdGenerator() {
-        return clientIdGenerator;
-    }
-
-    /**
-     * @param clientIdGenerator the clientIdGenerator to set
-     */
-    public void setClientIdGenerator(ClientIdGenerator clientIdGenerator) {
-        this.clientIdGenerator = clientIdGenerator;
-    }
+    
 
     /**
      * @return the protocolHandlerRepository
@@ -120,5 +91,28 @@ public class WebSocketConfigImpl implements WebSocketConfig {
         this.managerRepository = managerRepository;
     }
 
+    /**
+     * @return the servletConfig
+     */
+    @Override
+    public WebSocketServletConfig getServletConfig(String servletName) {
+        return servletConfigs.get(servletName);
+    }
+
+    /**
+     * @return the servletConfigs
+     */
+    public Map<String, WebSocketServletConfig> getServletConfigs() {
+        return servletConfigs;
+    }
+
+    /**
+     * @param servletConfigs the servletConfigs to set
+     */
+    public void setServletConfigs(Map<String, WebSocketServletConfig> servletConfigs) {
+        this.servletConfigs = servletConfigs;
+    }
+
+    
   
 }

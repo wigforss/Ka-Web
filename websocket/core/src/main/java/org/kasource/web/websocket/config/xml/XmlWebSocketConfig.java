@@ -1,18 +1,20 @@
 package org.kasource.web.websocket.config.xml;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
 
 import org.kasource.web.websocket.channel.WebSocketChannelFactory;
-import org.kasource.web.websocket.client.id.AbstractClientIdGenerator;
 import org.kasource.web.websocket.client.id.ClientIdGenerator;
 import org.kasource.web.websocket.client.id.DefaultClientIdGenerator;
 import org.kasource.web.websocket.config.ProtocolHandlerConfig;
 import org.kasource.web.websocket.config.WebSocketConfig;
 import org.kasource.web.websocket.config.WebSocketConfigException;
-import org.kasource.web.websocket.config.xml.jaxb.ClientIdGeneratorXmlConfig;
+import org.kasource.web.websocket.config.WebSocketServletConfig;
+import org.kasource.web.websocket.config.xml.jaxb.WebsocketXml;
 import org.kasource.web.websocket.config.xml.jaxb.WebsocketXmlConfigRoot;
 import org.kasource.web.websocket.manager.WebSocketManagerRepository;
 import org.kasource.web.websocket.manager.WebSocketManagerRepositoryImpl;
@@ -22,9 +24,9 @@ import org.kasource.web.websocket.protocol.ProtocolHandlerRepositoryImpl;
 public class XmlWebSocketConfig implements WebSocketConfig {
 
     private WebsocketXmlConfigRoot config;
-
-    private Set<String> orginWhitelist = new HashSet<String>();
-    private ClientIdGenerator idGenerator;
+    private ClientIdGenerator idGenerator = new DefaultClientIdGenerator();
+    private Set<String> originWhitelist = new HashSet<String>();
+    private Map<String, WebSocketServletConfig> servletConfigs = new HashMap<String, WebSocketServletConfig>();
     private ProtocolHandlerRepository protocolHandlerRepository;
     private WebSocketManagerRepositoryImpl managerRepository;
     private WebSocketChannelFactory channelFactory;
@@ -33,6 +35,8 @@ public class XmlWebSocketConfig implements WebSocketConfig {
         this.config = config;
         initialize(servletContext);
     }
+    
+   
     
     private void initialize(ServletContext servletContext) {
         loadProtocols();
@@ -43,19 +47,30 @@ public class XmlWebSocketConfig implements WebSocketConfig {
             authentication = new XmlAuthentication(config.getAuthentication());
         }
        
-        try {
-            idGenerator = loadClientIdGenerator();
-        } catch (Exception e) {
-           throw new WebSocketConfigException("Could not load ClientIdGenerator", e);
+        if(config.getClientIdGenerator() != null) {
+            idGenerator = new XmlClientIdGenerator(config.getClientIdGenerator()).getClientIdGenerator();
         }
         
+        
         if(config.getOrginWhitelist() != null) {
-            orginWhitelist.addAll(config.getOrginWhitelist().getOrgin());
+            originWhitelist.addAll(config.getOrginWhitelist().getOrgin());
         }
         managerRepository = new WebSocketManagerRepositoryImpl(servletContext);
         if(authentication != null) {
             managerRepository.setDefaultAuthenticationProvider(authentication.getAutenticationProvider());
             managerRepository.setAutenticationProviders(authentication.getAuthenticationUrlMapping());
+        }
+        managerRepository.setProtocolHandlerRepository(protocolHandlerRepository);
+        loadServletConfigs(idGenerator);
+    }
+    
+    private void loadServletConfigs(ClientIdGenerator idGenerator) {
+        for(WebsocketXml websocket :config.getWebsocket()) {
+            XmlWebSocketServletConfig servletConfig = new XmlWebSocketServletConfig(websocket, managerRepository, originWhitelist);
+            if(servletConfig.getClientIdGenerator() == null) {
+                servletConfig.setClientIdGenerator(idGenerator);
+            }
+            servletConfigs.put(servletConfig.getServletName(), servletConfig);
         }
     }
 
@@ -77,37 +92,11 @@ public class XmlWebSocketConfig implements WebSocketConfig {
         }
     }
     
-    private ClientIdGenerator loadClientIdGenerator() throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-        ClientIdGeneratorXmlConfig generatorConfig = config.getClientIdGenerator();
-        if(generatorConfig != null) {
-            Class<?> clazz = Class.forName(generatorConfig.getClazz());
-            ClientIdGenerator generator = (ClientIdGenerator) clazz.newInstance();
-            if(generator instanceof AbstractClientIdGenerator) {
-                AbstractClientIdGenerator abstractGenerator = (AbstractClientIdGenerator) generator;
-                abstractGenerator.setHeaderValue(generatorConfig.isHeaderValue());
-                if(generatorConfig.getIdKey() != null) {
-                    abstractGenerator.setIdKey(generatorConfig.getIdKey());
-                }
-                
-            }
-            return generator;
-        } else {
-            return new DefaultClientIdGenerator();
-        }
-    }
+   
     
    
 
-    @Override
-    public boolean isDynamicAddressing() {   
-        return config.isDynamicAddressing();
-    }
-
-    @Override
-    public ClientIdGenerator getClientIdGenerator() {
-        return idGenerator;
-    }
-
+  
 
     @Override
     public ProtocolHandlerRepository getProtocolHandlerRepository() {
@@ -117,7 +106,7 @@ public class XmlWebSocketConfig implements WebSocketConfig {
     @Override
     public Set<String> getOrginWhitelist() {
         
-        return orginWhitelist;
+        return originWhitelist;
     }
 
 
@@ -129,6 +118,11 @@ public class XmlWebSocketConfig implements WebSocketConfig {
     @Override
     public WebSocketChannelFactory getChannelFactory() {
         return channelFactory;
+    }
+
+    @Override
+    public WebSocketServletConfig getServletConfig(String servletName) {
+        return servletConfigs.get(servletName);
     }
 
 }

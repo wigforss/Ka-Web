@@ -14,6 +14,10 @@ package org.kasource.web.websocket.config.xml.jaxb;
 
 
 
+
+
+
+
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlElementDecl;
 import javax.xml.bind.annotation.XmlRegistry;
@@ -89,6 +93,15 @@ public class ObjectFactory {
     }
     
     /**
+     * Create an instance of {@link ProtocolUrlMapping }
+     * 
+     */
+    public ProtocolUrlMapping createProtocolUrlMapping() {
+        return new ProtocolUrlMapping();
+    }
+
+    
+    /**
      * Create an instance of {@link ProtocolHandlerXmlConfig }
      * 
      */
@@ -102,6 +115,14 @@ public class ObjectFactory {
      */
     public AuthenticationXmlConfig createAuthentication() {
         return new AuthenticationXmlConfig();
+    }
+    
+    /**
+     * Create an instance of {@link WebsocketXml }
+     * 
+     */
+    public WebsocketXml createWebsocket() {
+        return new WebsocketXml();
     }
 
     /**

@@ -2,27 +2,74 @@
 <beans xmlns="http://www.springframework.org/schema/beans" 
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:util="http://www.springframework.org/schema/util"
     xsi:schemaLocation="
         http://www.springframework.org/schema/beans 
         http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
         http://www.springframework.org/schema/context 
-        http://www.springframework.org/schema/context/spring-context-3.0.xsd"
- >
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        http://www.springframework.org/schema/util 
+        http://www.springframework.org/schema/util/spring-util-3.0.xsd">
    
  	<bean id="webSocketChannelFactory" class="org.kasource.web.websocket.spring.channel.SpringWebSocketChannelFactory"/> 
 	
-	<bean id="managerRepository" class="org.kasource.web.websocket.spring.manager.SpringWebSocketManagerRepository">
+	<util:map id="textProtocolUrlMapping">
+		<entry key="/chat/*">
+			<bean class="org.kasource.web.websocket.protocol.JsonProtocolHandler"/>
+		</entry>
+	</util:map>
+	
+	<bean id="textProtocols" class="org.kasource.web.websocket.config.TextProtocolHandlerConfigImpl">
+		<!--  <property name="defaultHandler">
+			<bean class="org.kasource.web.websocket.protocol.JsonProtocolHandler"/>
+		</property> -->
+		<property name="defaultProtocolUrlMap" ref="textProtocolUrlMapping"></property>
+	</bean>
+	
+	<bean id="protocolHandlerRepository" class="org.kasource.web.websocket.spring.protocol.ProtocolHandlerRepositoryFactoryBean"/>
+	<!--  
+	<bean id="protocolHandlerRepository" class="org.kasource.web.websocket.protocol.ProtocolHandlerRepositoryImpl">
+		<property name="textProtocolHandlerConfig" ref="textProtocols"/>
+	</bean>
+	-->
+	<util:map id="urlAuthentication">
+		<entry key="/chat/*">
+			<bean class="org.kasource.web.websocket.security.PassthroughAutenticationProvider"/>
+		</entry>
+	</util:map>
+	
+	<bean id="authConfig" class="org.kasource.web.websocket.spring.config.AuthenticationConfig">
+		<!--  
 		<property name="defaultAuthenticationProvider">
 			<bean class="org.kasource.web.websocket.security.PassthroughAutenticationProvider"/>
 		</property>
+		-->
+		<property name="authenticationUrlMapping" ref="urlAuthentication"/>
 	</bean>
 	
-	<bean id="webSocketConfig" class="org.kasource.web.websocket.spring.config.SpringWebSocketConfig" init-method="initialize">
-		<property name="managerRepository" ref="managerRepository"/>
+	
+	
+	<bean id="managerRepository" class="org.kasource.web.websocket.spring.manager.WebSocketManagerRepositoryFactoryBean"/>
+		
+		
+	
+	<util:map id="servletConfigs">
+		<entry key="chat" value-ref="chatServletConfig"/>
+	</util:map>
+	
+	<bean id="chatServletConfig" class="org.kasource.web.websocket.config.WebSocketServletConfigImpl">
 		<property name="clientIdGenerator">
 			<bean class="org.kasource.web.websocket.client.id.ClientIdGeneratorImpl"/>
 		</property>
 		<property name="dynamicAddressing" value="true"/>
+		<property name="managerRepository" ref="managerRepository"/>
+		<property name="protocolRepository" ref="protocolHandlerRepository"/>
+	</bean>
+	
+	<bean id="webSocketConfig" class="org.kasource.web.websocket.spring.config.SpringWebSocketConfig" init-method="initialize">
+		<property name="managerRepository" ref="managerRepository"/>
+		
+		<property name="servletConfigs" ref="servletConfigs"/>
 		<property name="channelFactory" ref="webSocketChannelFactory"/>
 	</bean>	
     
@@ -32,5 +79,7 @@
     <bean id="chatWebSocket" factory-bean="webSocketChannelFactory" factory-method="get">
         <constructor-arg value="/chat"/>
     </bean>
+    
+   
     
 </beans>

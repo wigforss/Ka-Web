@@ -5,50 +5,46 @@ import java.util.Map;
 
 import org.eclipse.jetty.websocket.WebSocket;
 import org.kasource.web.websocket.client.WebSocketClient;
-import org.kasource.web.websocket.manager.WebSocketManager;
+import org.kasource.web.websocket.client.WebSocketClientConfig;
 import org.kasource.web.websocket.protocol.ProtocolHandler;
+
 
 public class JettyWebSocketClient implements WebSocket, WebSocket.OnBinaryMessage, WebSocket.OnTextMessage, WebSocketClient {
 
-    private String username;
-    private WebSocketManager manager;
+    private WebSocketClientConfig clientConfig;
     private Connection connection;
-    private String id;
-    private Map<String, String[]> connectionParameters;
-    private ProtocolHandler<String> textProtocol;
-    private ProtocolHandler<byte[]> binaryProtocol;
+    private ProtocolHandler<String> textProtocolHandler;
+    private ProtocolHandler<byte[]> binaryProtocolHandler;
     
-    public JettyWebSocketClient(WebSocketManager manager, String username, String clientId, Map<String, String[]> connectionParameters) {
-        this.manager = manager;
-        this.username = username;
-        this.id = clientId;
-        this.connectionParameters = connectionParameters;
+    public JettyWebSocketClient( WebSocketClientConfig clientConfig) {
+        this.clientConfig = clientConfig;
+       
     }
     
     @Override
     public void onMessage(String data) {
-        manager.onWebSocketMessage(this, data, textProtocol);
+        clientConfig.getManager().onWebSocketMessage(this, data);
     }
 
     @Override
     public void onMessage(byte[] data, int offset, int length) {
         byte[] message = new byte[length];
         System.arraycopy(message, 0, data, offset, length);
-        manager.onWebSocketMessage(this, message, binaryProtocol);
+        clientConfig.getManager().onWebSocketMessage(this, message);
        
         
     }
 
     @Override
     public void onClose(int closeCode, String message) {
-      manager.unregisterClient(this);
+        clientConfig.getManager().unregisterClient(this);
         
     }
 
     @Override
     public void onOpen(Connection connection) {
        this.connection = connection;
-       manager.registerClient(this); 
+       clientConfig.getManager().registerClient(this); 
     }
 
     /**
@@ -78,29 +74,14 @@ public class JettyWebSocketClient implements WebSocket, WebSocket.OnBinaryMessag
         
     }
 
-    /**
-     * @param textProtocol the textProtocol to set
-     */
-    public void setTextProtocol(ProtocolHandler<String> textProtocol) {
-        this.textProtocol = textProtocol;
-    }
-
-
-
-
-    /**
-     * @param binaryProtocol the binaryProtocol to set
-     */
-    public void setBinaryProtocol(ProtocolHandler<byte[]> binaryProtocol) {
-        this.binaryProtocol = binaryProtocol;
-    }
+  
 
     /**
      * @return the username
      */
     @Override
     public String getUsername() {
-        return username;
+        return clientConfig.getUsername();
     }
 
 
@@ -110,7 +91,7 @@ public class JettyWebSocketClient implements WebSocket, WebSocket.OnBinaryMessag
      */
     @Override
     public Map<String, String[]> getConnectionParameters() {
-        return connectionParameters;
+        return clientConfig.getConnectionParameters();
     }
 
 
@@ -120,8 +101,57 @@ public class JettyWebSocketClient implements WebSocket, WebSocket.OnBinaryMessag
      */
     @Override
     public String getId() {
-        return id;
+        return clientConfig.getClientId();
     }
+    
+    @Override
+    public String getUrl() {
+        return clientConfig.getUrl();
+    }
+    
+    @Override
+    public String getSubProtocol() {
+        return clientConfig.getSubProtocol();
+    }
+
+    /**
+     * @return the textProtocolHandler
+     */
+    @Override
+    public ProtocolHandler<String> getTextProtocolHandler() {
+        return textProtocolHandler;
+    }
+
+
+
+    /**
+     * @param textProtocolHandler the textProtocolHandler to set
+     */
+    @Override
+    public void setTextProtocolHandler(ProtocolHandler<String> textProtocolHandler) {
+        this.textProtocolHandler = textProtocolHandler;
+    }
+
+
+
+    /**
+     * @return the binaryProtocolHandler
+     */
+    @Override
+    public ProtocolHandler<byte[]> getBinaryProtocolHandler() {
+        return binaryProtocolHandler;
+    }
+
+
+
+    /**
+     * @param binaryProtocolHandler the binaryProtocolHandler to set
+     */
+    @Override
+    public void setBinaryProtocolHandler(ProtocolHandler<byte[]> binaryProtocolHandler) {
+        this.binaryProtocolHandler = binaryProtocolHandler;
+    }
+
 
 
 }
