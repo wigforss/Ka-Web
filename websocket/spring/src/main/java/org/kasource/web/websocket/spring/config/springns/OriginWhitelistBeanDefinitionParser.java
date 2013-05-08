@@ -3,6 +3,7 @@ package org.kasource.web.websocket.spring.config.springns;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.kasource.web.websocket.spring.config.KaWebSocketBean;
 import org.kasource.web.websocket.spring.config.OriginWhiteListConfig;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.PropertyValue;
@@ -28,7 +29,7 @@ public class OriginWhitelistBeanDefinitionParser  extends AbstractSingleBeanDefi
     @Override
     protected void doParse(Element element, ParserContext pc,
             BeanDefinitionBuilder bean) {
-        element.setAttribute(ID_ATTRIBUTE, WebSocketXmlNamespaceHandler.ORIGIN_WHITELIST_ID);
+        element.setAttribute(ID_ATTRIBUTE, KaWebSocketBean.ORIGIN_WHITELIST_ID);
         List<String> originWhiteList = new ArrayList<String>();
         List<Element> originElements = WebSocketXmlNamespaceHandler.getChildElementsByName(element, "origin");
         for (Element origin : originElements) {

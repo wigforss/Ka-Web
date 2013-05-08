@@ -1,14 +1,11 @@
 package org.kasource.web.websocket.spring.config.springns;
 
 
-
-import static org.kasource.web.websocket.spring.config.springns.WebSocketXmlNamespaceHandler.BINARY_PROTOCOLS_CONFIG_ID;
-import static org.kasource.web.websocket.spring.config.springns.WebSocketXmlNamespaceHandler.TEXT_PROTOCOLS_CONFIG_ID;
-
 import java.util.List;
 
 import org.kasource.web.websocket.config.BinaryProtocolHandlerConfigImpl;
 import org.kasource.web.websocket.config.TextProtocolHandlerConfigImpl;
+import org.kasource.web.websocket.spring.config.KaWebSocketBean;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
@@ -34,9 +31,9 @@ public class ProtocolsBeanDefinitionParser extends AbstractSingleBeanDefinitionP
     protected void doParse(Element element, ParserContext pc,
             BeanDefinitionBuilder bean) {
         if(element.getLocalName().toLowerCase().contains("text")) {
-            element.setAttribute(ID_ATTRIBUTE, TEXT_PROTOCOLS_CONFIG_ID);
+            element.setAttribute(ID_ATTRIBUTE, KaWebSocketBean.TEXT_PROTOCOLS_CONFIG_ID);
         } else {
-            element.setAttribute(ID_ATTRIBUTE, BINARY_PROTOCOLS_CONFIG_ID);
+            element.setAttribute(ID_ATTRIBUTE, KaWebSocketBean.BINARY_PROTOCOLS_CONFIG_ID);
         }
         bean.setLazyInit(false);
         List<Element> protocolHandler = WebSocketXmlNamespaceHandler.getChildElementsByName(element, "protocolHandler");

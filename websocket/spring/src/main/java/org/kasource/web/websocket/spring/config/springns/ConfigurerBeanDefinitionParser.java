@@ -1,12 +1,8 @@
 package org.kasource.web.websocket.spring.config.springns;
-import static org.kasource.web.websocket.spring.config.springns.WebSocketXmlNamespaceHandler.CHANNEL_FACTORY_ID;
-import static org.kasource.web.websocket.spring.config.springns.WebSocketXmlNamespaceHandler.CONFIGURER_ID;
-import static org.kasource.web.websocket.spring.config.springns.WebSocketXmlNamespaceHandler.CONFIG_ID;
-import static org.kasource.web.websocket.spring.config.springns.WebSocketXmlNamespaceHandler.MANAGER_REPO_ID;
-import static org.kasource.web.websocket.spring.config.springns.WebSocketXmlNamespaceHandler.POST_BEAN_PROCESSOR_ID;
-import static org.kasource.web.websocket.spring.config.springns.WebSocketXmlNamespaceHandler.PROTOCOL_REPO_ID;
+
 
 import org.kasource.web.websocket.spring.channel.SpringWebSocketChannelFactory;
+import org.kasource.web.websocket.spring.config.KaWebSocketBean;
 import org.kasource.web.websocket.spring.config.SpringWebSocketConfigFactoryBean;
 import org.kasource.web.websocket.spring.config.SpringWebSocketConfigurer;
 import org.kasource.web.websocket.spring.manager.WebSocketManagerRepositoryFactoryBean;
@@ -41,10 +37,10 @@ public class ConfigurerBeanDefinitionParser extends AbstractSingleBeanDefinition
     @Override
     protected void doParse(Element element, ParserContext pc,
             BeanDefinitionBuilder bean) {
-        element.setAttribute(ID_ATTRIBUTE, CONFIGURER_ID);
-        bean.addPropertyReference("channelFactory", CHANNEL_FACTORY_ID);
+        element.setAttribute(ID_ATTRIBUTE, KaWebSocketBean.CONFIGURER_ID);
+        bean.addPropertyReference("channelFactory", KaWebSocketBean.CHANNEL_FACTORY_ID);
         bean.setInitMethodName("configure");
-        bean.addConstructorArgReference(CONFIG_ID);
+        bean.addConstructorArgReference(KaWebSocketBean.CONFIG_ID);
         bean.setLazyInit(false);
       
         createBeans(pc, element);
@@ -72,7 +68,7 @@ public class ConfigurerBeanDefinitionParser extends AbstractSingleBeanDefinition
         
         
         pc.registerBeanComponent(new BeanComponentDefinition(builder
-                    .getBeanDefinition(), PROTOCOL_REPO_ID));
+                    .getBeanDefinition(), KaWebSocketBean.PROTOCOL_REPO_ID));
     }
     
     private void createManagerRepository(ParserContext pc) {
@@ -81,15 +77,15 @@ public class ConfigurerBeanDefinitionParser extends AbstractSingleBeanDefinition
        
         builder.setLazyInit(false);
         pc.registerBeanComponent(new BeanComponentDefinition(builder
-            .getBeanDefinition(), MANAGER_REPO_ID));
+            .getBeanDefinition(), KaWebSocketBean.MANAGER_REPO_ID));
     }
     
     private void createConfig(ParserContext pc, Element element) {
         BeanDefinitionBuilder builder = BeanDefinitionBuilder
             .rootBeanDefinition(SpringWebSocketConfigFactoryBean.class);
-        builder.addPropertyReference("channelFactory", CHANNEL_FACTORY_ID);
-        builder.addPropertyReference("managerRepository", MANAGER_REPO_ID);
-        builder.addPropertyReference("protocolHandlerRepository", PROTOCOL_REPO_ID);
+        builder.addPropertyReference("channelFactory", KaWebSocketBean.CHANNEL_FACTORY_ID);
+        builder.addPropertyReference("managerRepository", KaWebSocketBean.MANAGER_REPO_ID);
+        builder.addPropertyReference("protocolHandlerRepository", KaWebSocketBean.PROTOCOL_REPO_ID);
         builder.setLazyInit(false);
         
        
@@ -101,7 +97,7 @@ public class ConfigurerBeanDefinitionParser extends AbstractSingleBeanDefinition
         
         
         pc.registerBeanComponent(new BeanComponentDefinition(builder
-            .getBeanDefinition(), CONFIG_ID));
+            .getBeanDefinition(), KaWebSocketBean.CONFIG_ID));
     }
     
     private void createChannelFactory(ParserContext pc) {
@@ -109,15 +105,15 @@ public class ConfigurerBeanDefinitionParser extends AbstractSingleBeanDefinition
         .rootBeanDefinition(SpringWebSocketChannelFactory.class);
     builder.setLazyInit(false);
     pc.registerBeanComponent(new BeanComponentDefinition(builder
-            .getBeanDefinition(), CHANNEL_FACTORY_ID));
+            .getBeanDefinition(), KaWebSocketBean.CHANNEL_FACTORY_ID));
     }
     
     private void createPostBeanProcessor(ParserContext pc) {
         BeanDefinitionBuilder builder = BeanDefinitionBuilder
             .rootBeanDefinition(WebSocketListenerPostBeanProcessor.class);
         builder.setLazyInit(false);
-        builder.addDependsOn(CHANNEL_FACTORY_ID);
+        builder.addDependsOn(KaWebSocketBean.CHANNEL_FACTORY_ID);
         pc.registerBeanComponent(new BeanComponentDefinition(builder
-                .getBeanDefinition(), POST_BEAN_PROCESSOR_ID));
+                .getBeanDefinition(), KaWebSocketBean.POST_BEAN_PROCESSOR_ID));
     }
 }

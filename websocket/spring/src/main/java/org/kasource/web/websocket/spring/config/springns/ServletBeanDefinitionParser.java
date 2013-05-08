@@ -1,9 +1,9 @@
 package org.kasource.web.websocket.spring.config.springns;
 
-import static org.kasource.web.websocket.spring.config.springns.WebSocketXmlNamespaceHandler.MANAGER_REPO_ID;
-import static org.kasource.web.websocket.spring.config.springns.WebSocketXmlNamespaceHandler.PROTOCOL_REPO_ID;
+
 
 import org.kasource.web.websocket.config.WebSocketServletConfigImpl;
+import org.kasource.web.websocket.spring.config.KaWebSocketBean;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -28,8 +28,8 @@ public class ServletBeanDefinitionParser  extends AbstractSingleBeanDefinitionPa
         element.setAttribute(ID_ATTRIBUTE, servletName + "Config");
         bean.addPropertyValue("servletName", servletName);
         bean.addPropertyValue("dynamicAddressing", "true".equals(element.getAttribute("dynamicAddressing")));
-        bean.addPropertyReference("managerRepository", MANAGER_REPO_ID);
-        bean.addPropertyReference("protocolRepository", PROTOCOL_REPO_ID);
+        bean.addPropertyReference("managerRepository", KaWebSocketBean.MANAGER_REPO_ID);
+        bean.addPropertyReference("protocolRepository", KaWebSocketBean.PROTOCOL_REPO_ID);
         String ref = element.getAttribute("clientIdGeneratorRef");
         if(ref != null && !ref.isEmpty()) {
             bean.addPropertyReference("clientIdGenerator", ref);

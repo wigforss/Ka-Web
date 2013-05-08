@@ -1,10 +1,10 @@
 package org.kasource.web.websocket.spring.config.springns;
 
-import static org.kasource.web.websocket.spring.config.springns.WebSocketXmlNamespaceHandler.AUTHENTICATION_CONFIG_ID;
 
 import java.util.List;
 
 import org.kasource.web.websocket.spring.config.AuthenticationConfig;
+import org.kasource.web.websocket.spring.config.KaWebSocketBean;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
@@ -25,7 +25,7 @@ public class AuthenticationBeanDefinitionParser  extends AbstractSingleBeanDefin
     @Override
     protected void doParse(Element element, ParserContext pc,
             BeanDefinitionBuilder bean) {
-        element.setAttribute(ID_ATTRIBUTE, AUTHENTICATION_CONFIG_ID);
+        element.setAttribute(ID_ATTRIBUTE, KaWebSocketBean.AUTHENTICATION_CONFIG_ID);
        
        
         String ref = element.getAttribute("defaultProviderRef");

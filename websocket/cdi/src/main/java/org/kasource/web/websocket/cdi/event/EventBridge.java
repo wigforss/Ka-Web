@@ -177,7 +177,7 @@ public class EventBridge implements WebSocketEventListener, WebSocketListenerReg
     @Override
     public void onWebSocketEvent(WebSocketEvent event) {
        
-       Annotation annotation = mapping.getAnnotationForSocket(event.getSource().getName()); 
+       Annotation annotation = mapping.getAnnotationForSocket(event.getSource().getUrl()); 
         
        if(event instanceof WebSocketTextMessageEvent) {
            if (annotation == null) {

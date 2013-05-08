@@ -31,11 +31,9 @@
        				<autoDelete>true</autoDelete>
        				<port>8080</port>
        				<contextRoot>/chat-example</contextRoot>
-       			  	<commands>
-       					<command>
-       						set configs.config.server-config.network-config.protocols.protocol.http-listener-1.http.websockets-support-enabled=true
-       					</command>
-       				</commands> 
+       				<glassfishProperties>
+       					configs.config.server-config.network-config.protocols.protocol.http-listener-1.http.websockets-support-enabled=true
+       				</glassfishProperties>
     			</configuration> 
     		</plugin>
     		<plugin>

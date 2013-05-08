@@ -43,35 +43,43 @@ public class SpringWebSocketConfigFactoryBean  implements FactoryBean<WebSocketC
                throw e;
            }
         }
-        Map<String, WebSocketServletConfigImpl> servletConfigBeans = applicationContext.getBeansOfType(WebSocketServletConfigImpl.class);
-        Map<String, WebSocketServletConfig> servletConfigs = new HashMap<String, WebSocketServletConfig>();
-        for(WebSocketServletConfigImpl servletConfigBean : servletConfigBeans.values()) {
-            if(originList != null && originList.getOriginWhiteList() != null) {
-                servletConfigBean.setOriginWhitelist(originList.getOriginWhiteList());
-            } 
-            if(servletConfigBean.getClientIdGenerator() == null) {
-                servletConfigBean.setClientIdGenerator(clientIdGenerator != null ? clientIdGenerator : new DefaultClientIdGenerator());
-            }
-            servletConfigs.put(servletConfigBean.getServletName(), servletConfigBean);
-        }
        
         
-        WebSocketConfigImpl config = new WebSocketConfigImpl();
+       
+        
+        SpringWebSocketConfig config = new SpringWebSocketConfig();
+     
+        config.setClientIdGenerator(clientIdGenerator);
+        
         config.setChannelFactory(channelFactory);
         config.setManagerRepository(managerRepository);
         config.setProtocolHandlerRepository(protocolHandlerRepository);
         if(originList != null && originList.getOriginWhiteList() != null) {
             config.setOrginWhitelist(originList.getOriginWhiteList());
         }
-        config.setServletConfigs(servletConfigs);
+        registerServlets(config);
        
         return config;
     }
 
+    
+    private void registerServlets(SpringWebSocketConfig config) {
+        Map<String, WebSocketServletConfig> servletConfigs = new HashMap<String, WebSocketServletConfig>();
+        String[] beans = applicationContext.getBeanNamesForType(WebSocketServletConfigImpl.class);
+        for(String beanName : beans) {
+            if(!applicationContext.isPrototype(beanName)) {
+                WebSocketServletConfigImpl servletConfigBean = applicationContext.getBean(beanName, WebSocketServletConfigImpl.class);
+                config.registerServlet(servletConfigBean);
+            }
+        }
+  
+  
+    }
+    
     @Override
     public Class<?> getObjectType() {
        
-        return WebSocketConfig.class;
+        return SpringWebSocketConfig.class;
     }
 
     @Override

@@ -6,6 +6,7 @@ import javax.servlet.ServletContext;
 import org.kasource.web.websocket.channel.WebSocketChannel;
 import org.kasource.web.websocket.channel.WebSocketChannelFactory;
 import org.kasource.web.websocket.channel.WebSocketChannelFactoryImpl;
+import org.kasource.web.websocket.config.WebSocketConfigException;
 import org.kasource.web.websocket.listener.WebSocketEventListener;
 
 /**
@@ -13,24 +14,19 @@ import org.kasource.web.websocket.listener.WebSocketEventListener;
  * 
  * @author rikardwi
  **/
-public class GuiceWebSocketChannelFactory implements WebSocketChannelFactory {
+public class GuiceWebSocketChannelFactory extends WebSocketChannelFactoryImpl {
 
    
-    private WebSocketChannelFactory factory;
+  
     
     @Inject
     public GuiceWebSocketChannelFactory(ServletContext servletContext) {
-        factory = (WebSocketChannelFactory) servletContext.getAttribute(WebSocketChannelFactory.class.getName());
+       try {
+           initialize(servletContext);
+       } catch (Exception e) {
+           throw new WebSocketConfigException("Could not create "+ GuiceWebSocketChannelFactory.class.getName(), e);
+       }
     }
 
-    @Override
-    public WebSocketChannel get(String socketChannelName) {
-       return factory.get(socketChannelName);
-    }
-
-    @Override
-    public void listenTo(String socketChannelName, WebSocketEventListener listener) {
-       factory.listenTo(socketChannelName, listener);
-        
-    }
+   
 }

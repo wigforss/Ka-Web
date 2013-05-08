@@ -7,8 +7,12 @@
 >
 	<display-name>Ka Web Socket GlassFish / CDI Example</display-name>
 	
+	<context-param>
+		<param-name>webSocketConfigLocation</param-name>
+		<param-value>/WEB-INF/websocket-config.xml</param-value>
+	</context-param>
 	<listener>
-		<listener-class>org.kasource.web.websocket.channel.WebSocketChannelFactoryImpl</listener-class>
+		<listener-class>org.kasource.web.websocket.bootstrap.WebSocketConfigListener</listener-class>
 	</listener>
 	<servlet>
         <description>WebSocketsServlet</description>
