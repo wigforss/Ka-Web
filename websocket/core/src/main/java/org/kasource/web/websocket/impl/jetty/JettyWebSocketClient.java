@@ -152,6 +152,25 @@ public class JettyWebSocketClient implements WebSocket, WebSocket.OnBinaryMessag
         this.binaryProtocolHandler = binaryProtocolHandler;
     }
 
+    @Override
+    public void sendBinaryMessageToSocket(Object message) {
+        if(binaryProtocolHandler == null) {
+            throw new IllegalStateException("No binary handler configured for client");
+        }
+        sendMessageToSocket(binaryProtocolHandler.toMessage(message));
+        
+    }
+
+
+
+    @Override
+    public void sendTextMessageToSocket(Object message) {
+        if(textProtocolHandler == null) {
+            throw new IllegalStateException("No text handler configured for client");
+        }
+        sendMessageToSocket(textProtocolHandler.toMessage(message));
+        
+    }
 
 
 }

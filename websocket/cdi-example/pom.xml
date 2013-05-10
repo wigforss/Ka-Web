@@ -99,7 +99,7 @@
 			<version>${project.version}</version>
 		</dependency>
     <dependency>
-    	<groupId>org.kasource</groupId>
+    	<groupId>org.kasource.websocket</groupId>
 		<artifactId>ka-cdi-websocket</artifactId>
 		<version>${project.version}</version>
     </dependency>

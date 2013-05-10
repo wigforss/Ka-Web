@@ -3,7 +3,6 @@ package org.kasource.web.websocket.spring.registration;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import javax.annotation.PostConstruct;
 import javax.servlet.ServletContext;
 
 import org.kasource.web.websocket.register.WebSocketListenerRegister;
@@ -27,10 +26,6 @@ public class WebSocketListenerPostBeanProcessor implements BeanPostProcessor, Se
        private Queue<Object> beans = new LinkedList<Object>(); 
         
         
-        @PostConstruct
-        protected void initialize() {
-           
-        }
         
         @Override
         public Object postProcessAfterInitialization(Object object, String beanName) throws BeansException {
@@ -51,7 +46,9 @@ public class WebSocketListenerPostBeanProcessor implements BeanPostProcessor, Se
 
         @Override
         public void afterPropertiesSet() throws Exception {
-            listenerRegister = new WebSocketListenerRegisterImpl(servletContext);
+            if(listenerRegister == null) {
+                listenerRegister = new WebSocketListenerRegisterImpl(servletContext);
+            }
             if(!beans.isEmpty()) {
                 while(!beans.isEmpty()) {
                     listenerRegister.registerListener(beans.poll());
@@ -65,6 +62,15 @@ public class WebSocketListenerPostBeanProcessor implements BeanPostProcessor, Se
         public void setServletContext(ServletContext servletContext) {
            this.servletContext = servletContext;
             
+        }
+
+
+
+        /**
+         * @param listenerRegister the listenerRegister to set
+         */
+        public void setListenerRegister(WebSocketListenerRegister listenerRegister) {
+            this.listenerRegister = listenerRegister;
         }
         
         

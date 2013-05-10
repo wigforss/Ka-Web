@@ -7,11 +7,10 @@ import javax.servlet.ServletContext;
 import org.kasource.web.websocket.channel.WebSocketChannelFactory;
 import org.kasource.web.websocket.client.id.ClientIdGenerator;
 import org.kasource.web.websocket.config.WebSocketConfig;
-import org.kasource.web.websocket.config.WebSocketServletConfig;
 import org.kasource.web.websocket.config.WebSocketServletConfigImpl;
-import org.kasource.web.websocket.config.xml.jaxb.OrginWhitelistXmlConfig;
 import org.kasource.web.websocket.manager.WebSocketManagerRepository;
 import org.kasource.web.websocket.protocol.ProtocolHandlerRepository;
+import org.kasource.web.websocket.register.WebSocketListenerRegister;
 import org.kasource.web.websocket.spring.channel.SpringWebSocketChannelFactory;
 import org.kasource.web.websocket.spring.config.KaWebSocketBean;
 import org.kasource.web.websocket.spring.config.OriginWhiteListConfig;
@@ -19,6 +18,7 @@ import org.kasource.web.websocket.spring.config.SpringWebSocketConfigFactoryBean
 import org.kasource.web.websocket.spring.config.SpringWebSocketConfigurer;
 import org.kasource.web.websocket.spring.manager.WebSocketManagerRepositoryFactoryBean;
 import org.kasource.web.websocket.spring.protocol.ProtocolHandlerRepositoryFactoryBean;
+import org.kasource.web.websocket.spring.registration.SpringWebSocketListenerRegister;
 import org.kasource.web.websocket.spring.registration.WebSocketListenerPostBeanProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -71,12 +71,22 @@ public class SpringKaWebSocket implements ServletContextAware {
         channelFactory.afterPropertiesSet();
         return channelFactory;
     }
+    
+    @Bean(name = KaWebSocketBean.LISTENER_REGISTER_ID)
+    public WebSocketListenerRegister getWebSocketListenerRegister() throws Exception {
+        SpringWebSocketListenerRegister listenerRegister = new SpringWebSocketListenerRegister();
+        listenerRegister.setServletContext(servletContext);
+        listenerRegister.afterPropertiesSet();
+        return listenerRegister;
+    }
 
+    @Autowired
     @Bean(name = KaWebSocketBean.POST_BEAN_PROCESSOR_ID)
     @DependsOn(KaWebSocketBean.CHANNEL_FACTORY_ID)
-    public WebSocketListenerPostBeanProcessor getWebSocketListenerPostBeanProcessor() throws Exception {
+    public WebSocketListenerPostBeanProcessor getWebSocketListenerPostBeanProcessor(WebSocketListenerRegister register) throws Exception {
         WebSocketListenerPostBeanProcessor processor = new WebSocketListenerPostBeanProcessor();
         processor.setServletContext(servletContext);
+        processor.setListenerRegister(register);
         processor.afterPropertiesSet();
         return processor;
     }

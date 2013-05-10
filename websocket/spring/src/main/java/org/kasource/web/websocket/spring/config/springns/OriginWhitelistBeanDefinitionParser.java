@@ -26,6 +26,7 @@ public class OriginWhitelistBeanDefinitionParser  extends AbstractSingleBeanDefi
      * @param pc      Parser context.
      * @param bean    Bean definition.
      **/
+    @SuppressWarnings("unchecked")
     @Override
     protected void doParse(Element element, ParserContext pc,
             BeanDefinitionBuilder bean) {

@@ -274,5 +274,39 @@ public class WebSocketChannelImpl implements WebSocketChannel, ClientListener {
         
     }
 
+    @Override
+    public void broadcast(Object message) {
+        if(sender != null) {
+            sender.broadcast(message);
+        }
+        
+    }
+
+    @Override
+    public void broadcastBinary(Object message) {
+        if(sender != null) {
+            sender.broadcastBinary(message);
+        }
+        
+    }
+
+    @Override
+    public void sendMessage(Object message, String recipient, RecipientType recipientType) throws IOException,
+                NoSuchWebSocketClient {
+        if(sender != null) {
+            sender.sendMessage(message, recipient, recipientType);
+        }
+        
+    }
+
+    @Override
+    public void sendBinaryMessage(Object message, String recipient, RecipientType recipientType) throws IOException,
+                NoSuchWebSocketClient {
+        if(sender != null) {
+            sender.sendBinaryMessage(message, recipient, recipientType);
+        }
+        
+    }
+
     
 }

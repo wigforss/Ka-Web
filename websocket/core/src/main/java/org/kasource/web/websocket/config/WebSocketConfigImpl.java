@@ -10,6 +10,7 @@ import org.kasource.web.websocket.channel.WebSocketChannelFactory;
 import org.kasource.web.websocket.manager.WebSocketManagerRepository;
 import org.kasource.web.websocket.protocol.ProtocolHandlerRepository;
 import org.kasource.web.websocket.protocol.ProtocolHandlerRepositoryImpl;
+import org.kasource.web.websocket.register.WebSocketListenerRegister;
 
 public class WebSocketConfigImpl implements WebSocketConfig {
    
@@ -24,7 +25,8 @@ public class WebSocketConfigImpl implements WebSocketConfig {
 
     private Map<String, WebSocketServletConfig> servletConfigs = new HashMap<String, WebSocketServletConfig>();
    
-
+    private WebSocketListenerRegister listenerRegister;
+    
     /**
      * @return the orginWhitelist
      */
@@ -111,6 +113,21 @@ public class WebSocketConfigImpl implements WebSocketConfig {
      */
     public void setServletConfigs(Map<String, WebSocketServletConfig> servletConfigs) {
         this.servletConfigs = servletConfigs;
+    }
+
+    /**
+     * @return the listenerRegister
+     */
+    @Override
+    public WebSocketListenerRegister getListenerRegister() {
+        return listenerRegister;
+    }
+
+    /**
+     * @param listenerRegister the listenerRegister to set
+     */
+    public void setListenerRegister(WebSocketListenerRegister listenerRegister) {
+        this.listenerRegister = listenerRegister;
     }
 
     

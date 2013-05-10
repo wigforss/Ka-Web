@@ -7,8 +7,6 @@
 >
 	<display-name>Ka Web Socket Spring Example</display-name>
 
-	<distributable/>
-
     <!-- Spring 3 Configuration -->
     <!--
 	<context-param>

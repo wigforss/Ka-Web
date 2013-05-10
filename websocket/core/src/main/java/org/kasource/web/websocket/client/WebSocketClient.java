@@ -25,7 +25,9 @@ public interface WebSocketClient {
      **/
     public void sendMessageToSocket(byte[] message);
     
-   
+    public void sendBinaryMessageToSocket(Object message);
+    
+    public void sendTextMessageToSocket(Object message);
     
     /**
      * @return the username

@@ -1,18 +1,11 @@
 package org.kasource.web.websocket.spring.config;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.kasource.web.websocket.channel.WebSocketChannelFactory;
 import org.kasource.web.websocket.client.id.ClientIdGenerator;
-import org.kasource.web.websocket.client.id.DefaultClientIdGenerator;
 import org.kasource.web.websocket.config.WebSocketConfig;
-import org.kasource.web.websocket.config.WebSocketConfigImpl;
-import org.kasource.web.websocket.config.WebSocketServletConfig;
 import org.kasource.web.websocket.config.WebSocketServletConfigImpl;
 import org.kasource.web.websocket.manager.WebSocketManagerRepository;
 import org.kasource.web.websocket.protocol.ProtocolHandlerRepository;
-import org.kasource.web.websocket.protocol.ProtocolHandlerRepositoryImpl;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Required;
@@ -64,7 +57,7 @@ public class SpringWebSocketConfigFactoryBean  implements FactoryBean<WebSocketC
 
     
     private void registerServlets(SpringWebSocketConfig config) {
-        Map<String, WebSocketServletConfig> servletConfigs = new HashMap<String, WebSocketServletConfig>();
+      
         String[] beans = applicationContext.getBeanNamesForType(WebSocketServletConfigImpl.class);
         for(String beanName : beans) {
             if(!applicationContext.isPrototype(beanName)) {

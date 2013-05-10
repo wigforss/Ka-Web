@@ -7,11 +7,9 @@ import javax.servlet.ServletContext;
 import org.kasource.web.websocket.manager.WebSocketManagerRepository;
 import org.kasource.web.websocket.manager.WebSocketManagerRepositoryImpl;
 import org.kasource.web.websocket.protocol.ProtocolHandlerRepository;
-
 import org.kasource.web.websocket.spring.config.AuthenticationConfig;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.web.context.ServletContextAware;

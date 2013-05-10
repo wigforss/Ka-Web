@@ -46,7 +46,11 @@ public class WebSocketManagerImpl implements WebSocketManager {
     public void broadcast(String message) {
         
         for (WebSocketClient client : clients.values()) {
-            client.sendMessageToSocket(message);         
+            try {
+                client.sendMessageToSocket(message);   
+            } catch (Exception e) {
+                LOG.debug("Could not broadcast to " + client.getUsername() + " with id " + client.getId(), e);
+            }
         }
         
     }
@@ -59,7 +63,11 @@ public class WebSocketManagerImpl implements WebSocketManager {
     @Override
     public void broadcastBinary(byte[] message) {
         for (WebSocketClient client : clients.values()) {
+            try {
              client.sendMessageToSocket(message);
+            } catch (Exception e) {
+                LOG.debug("Could not broadcast to " + client.getUsername() + " with id " + client.getId(), e);
+            }
         }
         
     }
@@ -302,7 +310,92 @@ public class WebSocketManagerImpl implements WebSocketManager {
     public void setProtocolHandlerRepository(ProtocolHandlerRepository protocolHandlerRepository) {
         this.protocolHandlerRepository = protocolHandlerRepository;
     }
+
+    @Override
+    public void broadcast(Object message) {
+        for (WebSocketClient client : clients.values()) {
+            try {
+                client.sendTextMessageToSocket(message);
+            } catch (Exception e) {
+                LOG.debug("Could not broadcast to " + client.getUsername() + " with id " + client.getId(), e);
+            }
+        }
+        
+    }
+
+    @Override
+    public void broadcastBinary(Object message) {
+        for (WebSocketClient client : clients.values()) {
+            try {
+                client.sendBinaryMessageToSocket(message);
+            } catch (Exception e) {
+                LOG.debug("Could not broadcast to " + client.getUsername() + " with id " + client.getId(), e);
+            }
+       }
+        
+    }
+
+    @Override
+    public void sendMessage(Object message, String recipient, RecipientType recipientType) throws IOException,
+                NoSuchWebSocketClient {
+        if(recipientType == RecipientType.USERNAME) {
+            sendMessageAsObjectToUser(recipient, message);
+        } else {
+         WebSocketClient client = clients.get(recipient);
+         if(client == null) {
+             throw new NoSuchWebSocketClient("No client found with ID " + recipient);
+         }
+         client.sendTextMessageToSocket(message);         
+        }
+       
+        
+    }
+
+    
+    /**
+     * Sends a text message to a specific user
+     * 
+     * @param clientId ID of the recipient
+     * @param message to send.
+     **/
+    private void sendMessageAsObjectToUser(String username, Object message) throws IOException, NoSuchWebSocketClient {      
+        Set<WebSocketClient> clientsForUser = clientsByUser.get(username);
+        if(clientsForUser == null || clientsForUser.isEmpty()) {
+            throw new NoSuchWebSocketClient("No client found for user " + username);
+        }
+        for(WebSocketClient client : clientsForUser) {
+            client.sendTextMessageToSocket(message);
+        }
+        
+        
+    }
+
+    
+    @Override
+    public void sendBinaryMessage(Object message, String recipient, RecipientType recipientType) throws IOException,
+                NoSuchWebSocketClient {
+        if(recipientType == RecipientType.USERNAME) {
+            sendBinaryAsObjectMessageToUser(recipient, message);
+        } else {
+            WebSocketClient client = clients.get(recipient);
+            if(client == null) {
+                throw new NoSuchWebSocketClient("No client found with ID " + recipient);
+            }
+            client.sendBinaryMessageToSocket(message);         
+        }
+        
+    }
      
+    private void sendBinaryAsObjectMessageToUser(String username, Object message) throws IOException, NoSuchWebSocketClient {
+        Set<WebSocketClient> clientsForUser = clientsByUser.get(username);
+        if(clientsForUser == null || clientsForUser.isEmpty()) {
+            throw new NoSuchWebSocketClient("No client found for user " + username);
+        }
+        for(WebSocketClient client : clientsForUser) {
+            client.sendBinaryMessageToSocket(message);
+        }
+        
+    }
    
 
 }

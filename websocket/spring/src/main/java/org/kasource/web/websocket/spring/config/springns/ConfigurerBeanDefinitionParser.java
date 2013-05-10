@@ -7,6 +7,7 @@ import org.kasource.web.websocket.spring.config.SpringWebSocketConfigFactoryBean
 import org.kasource.web.websocket.spring.config.SpringWebSocketConfigurer;
 import org.kasource.web.websocket.spring.manager.WebSocketManagerRepositoryFactoryBean;
 import org.kasource.web.websocket.spring.protocol.ProtocolHandlerRepositoryFactoryBean;
+import org.kasource.web.websocket.spring.registration.SpringWebSocketListenerRegister;
 import org.kasource.web.websocket.spring.registration.WebSocketListenerPostBeanProcessor;
 import org.springframework.beans.factory.parsing.BeanComponentDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -57,7 +58,18 @@ public class ConfigurerBeanDefinitionParser extends AbstractSingleBeanDefinition
         createManagerRepository(pc);
         createChannelFactory(pc);
         createPostBeanProcessor(pc);
+        createListenerRegister(pc);
         createConfig(pc, element);
+    }
+    
+    private void createListenerRegister(ParserContext pc) {
+        BeanDefinitionBuilder builder = BeanDefinitionBuilder
+        .rootBeanDefinition(
+                    SpringWebSocketListenerRegister.class);
+        builder.setLazyInit(false);
+        
+        pc.registerBeanComponent(new BeanComponentDefinition(builder
+                    .getBeanDefinition(), KaWebSocketBean.LISTENER_REGISTER_ID));
     }
     
     private void createProtocolRepository(ParserContext pc) {
@@ -86,6 +98,7 @@ public class ConfigurerBeanDefinitionParser extends AbstractSingleBeanDefinition
         builder.addPropertyReference("channelFactory", KaWebSocketBean.CHANNEL_FACTORY_ID);
         builder.addPropertyReference("managerRepository", KaWebSocketBean.MANAGER_REPO_ID);
         builder.addPropertyReference("protocolHandlerRepository", KaWebSocketBean.PROTOCOL_REPO_ID);
+        builder.addPropertyReference("listenerRegister", KaWebSocketBean.LISTENER_REGISTER_ID);
         builder.setLazyInit(false);
         
        
@@ -113,6 +126,7 @@ public class ConfigurerBeanDefinitionParser extends AbstractSingleBeanDefinition
             .rootBeanDefinition(WebSocketListenerPostBeanProcessor.class);
         builder.setLazyInit(false);
         builder.addDependsOn(KaWebSocketBean.CHANNEL_FACTORY_ID);
+        builder.addPropertyReference("listenerRegister", KaWebSocketBean.LISTENER_REGISTER_ID);
         pc.registerBeanComponent(new BeanComponentDefinition(builder
                 .getBeanDefinition(), KaWebSocketBean.POST_BEAN_PROCESSOR_ID));
     }

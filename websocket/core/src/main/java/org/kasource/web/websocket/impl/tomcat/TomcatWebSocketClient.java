@@ -14,11 +14,13 @@ import org.kasource.web.websocket.client.WebSocketClient;
 import org.kasource.web.websocket.client.WebSocketClientConfig;
 import org.kasource.web.websocket.protocol.ProtocolHandler;
 import org.kasource.web.websocket.util.IoUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
 public class TomcatWebSocketClient extends StreamInbound implements WebSocketClient {
-
+    private static final Logger LOG = LoggerFactory.getLogger(TomcatWebSocketClient.class);
     private WebSocketClientConfig clientConfig;
     private IoUtils ioUtils = new IoUtils();
     private ProtocolHandler<String> textProtocolHandler;
@@ -67,6 +69,7 @@ public class TomcatWebSocketClient extends StreamInbound implements WebSocketCli
         try {
             getWsOutbound().writeTextMessage(CharBuffer.wrap(message));
         } catch (IOException e) {
+            LOG.debug("Could not send message to socket to " + clientConfig.getUsername() + " with id " + clientConfig.getClientId(), e);
         }
         
     }
@@ -78,6 +81,7 @@ public class TomcatWebSocketClient extends StreamInbound implements WebSocketCli
         try {
             getWsOutbound().writeBinaryMessage(ByteBuffer.wrap(message));
         } catch (IOException e) {
+            LOG.debug("Could not send message to socket to " + clientConfig.getUsername() + " with id " + clientConfig.getClientId(), e);
         }
         
     }
@@ -161,6 +165,28 @@ public class TomcatWebSocketClient extends StreamInbound implements WebSocketCli
     @Override
     public void setBinaryProtocolHandler(ProtocolHandler<byte[]> binaryProtocolHandler) {
         this.binaryProtocolHandler = binaryProtocolHandler;
+    }
+
+
+
+    @Override
+    public void sendBinaryMessageToSocket(Object message) {
+        if(binaryProtocolHandler == null) {
+            throw new IllegalStateException("No binary handler configured for client");
+        }
+        sendMessageToSocket(binaryProtocolHandler.toMessage(message));
+        
+    }
+
+
+
+    @Override
+    public void sendTextMessageToSocket(Object message) {
+        if(textProtocolHandler == null) {
+            throw new IllegalStateException("No text handler configured for client");
+        }
+        sendMessageToSocket(textProtocolHandler.toMessage(message));
+        
     }
 
 

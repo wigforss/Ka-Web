@@ -23,11 +23,21 @@ public interface WebsocketMessageSender  {
     public void broadcast(String message);
     
     /**
+     * Broadcasts a text message to all clients.
+     * 
+     * @param message Message to send.
+     **/
+    public void broadcast(Object message);
+    
+    
+    /**
      * Broadcasts a binary message to all clients.
      * 
      * @param message Message to send.
      **/
     public void broadcastBinary(byte[] message);
+    
+    public void broadcastBinary(Object message);
     
     /**
      * Sends a text message to a specific client.
@@ -42,6 +52,7 @@ public interface WebsocketMessageSender  {
     public void sendMessage(String message, String recipient, RecipientType recipientType) throws IOException, NoSuchWebSocketClient; 
     
     
+    public void sendMessage(Object message, String recipient, RecipientType recipientType) throws IOException, NoSuchWebSocketClient;
     
     /**
      * Sends a binary message to a specific client.
@@ -55,6 +66,7 @@ public interface WebsocketMessageSender  {
      **/
     public void sendBinaryMessage(byte[] message, String recipient, RecipientType recipientType) throws IOException, NoSuchWebSocketClient; 
     
+    public void sendBinaryMessage(Object message, String recipient, RecipientType recipientType) throws IOException, NoSuchWebSocketClient; 
    
     
 }

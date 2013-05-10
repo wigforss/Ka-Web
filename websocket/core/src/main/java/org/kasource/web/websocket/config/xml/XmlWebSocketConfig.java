@@ -20,6 +20,8 @@ import org.kasource.web.websocket.manager.WebSocketManagerRepository;
 import org.kasource.web.websocket.manager.WebSocketManagerRepositoryImpl;
 import org.kasource.web.websocket.protocol.ProtocolHandlerRepository;
 import org.kasource.web.websocket.protocol.ProtocolHandlerRepositoryImpl;
+import org.kasource.web.websocket.register.WebSocketListenerRegister;
+import org.kasource.web.websocket.register.WebSocketListenerRegisterImpl;
 
 public class XmlWebSocketConfig implements WebSocketConfig {
 
@@ -30,7 +32,7 @@ public class XmlWebSocketConfig implements WebSocketConfig {
     private ProtocolHandlerRepository protocolHandlerRepository;
     private WebSocketManagerRepositoryImpl managerRepository;
     private WebSocketChannelFactory channelFactory;
-    
+    private WebSocketListenerRegister listenerRegister;
     public XmlWebSocketConfig(WebsocketXmlConfigRoot config, ServletContext servletContext) {
         this.config = config;
         initialize(servletContext);
@@ -62,6 +64,7 @@ public class XmlWebSocketConfig implements WebSocketConfig {
         }
         managerRepository.setProtocolHandlerRepository(protocolHandlerRepository);
         loadServletConfigs(idGenerator);
+        listenerRegister = new WebSocketListenerRegisterImpl(servletContext);
     }
     
     private void loadServletConfigs(ClientIdGenerator idGenerator) {
@@ -123,6 +126,13 @@ public class XmlWebSocketConfig implements WebSocketConfig {
     @Override
     public WebSocketServletConfig getServletConfig(String servletName) {
         return servletConfigs.get(servletName);
+    }
+
+
+
+    @Override
+    public WebSocketListenerRegister getListenerRegister() {
+        return listenerRegister;
     }
 
 }
