@@ -7,7 +7,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.kasource</groupId>
     <artifactId>ka-web</artifactId>
-    <version>0.3</version>
+    <version>0.4-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Ka Web</name>
     <description>Ka Web base project</description>
