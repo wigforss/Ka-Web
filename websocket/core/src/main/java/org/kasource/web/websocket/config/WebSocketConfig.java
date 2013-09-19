@@ -11,7 +11,7 @@ import org.kasource.web.websocket.register.WebSocketListenerRegister;
 
 public interface WebSocketConfig {
  
-    public Set<String> getOrginWhitelist();
+    public Set<String> getOriginWhitelist();
     
     public WebSocketServletConfig getServletConfig(String servletName);
     
@@ -22,4 +22,6 @@ public interface WebSocketConfig {
     public WebSocketChannelFactory getChannelFactory();
     
     public WebSocketListenerRegister getListenerRegister();
+    
+    public void registerServlet(WebSocketServletConfigImpl servlet);
 }

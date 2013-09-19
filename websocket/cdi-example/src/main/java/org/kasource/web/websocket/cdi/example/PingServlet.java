@@ -21,7 +21,7 @@ import org.kasource.web.websocket.channel.WebSocketChannelFactory;
  * 
  * @author rikardwi
  **/
-@WebServlet(name="PingServlet", urlPatterns = "/ping", loadOnStartup = 2)
+@WebServlet(name="PingServlet", urlPatterns = "/ping", loadOnStartup = 1)
 public class PingServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     
@@ -30,6 +30,9 @@ public class PingServlet extends HttpServlet {
      
    @Inject
    private WebSocketChannelFactory channelFactory;
+   
+   @Inject 
+   private ExampleConfiguration exampleConfig;
     
  
     @Override

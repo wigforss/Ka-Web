@@ -6,7 +6,7 @@
     version="3.0"
 >
 	<display-name>Ka Web Socket Guice Example</display-name>
-	
+	<!--  
 	<context-param>
 		<param-name>webSocketConfigLocation</param-name>
 		<param-value>/WEB-INF/websocket-config.xml</param-value>
@@ -14,6 +14,7 @@
 	<listener>
 		<listener-class>org.kasource.web.websocket.bootstrap.WebSocketConfigListener</listener-class>
 	</listener>
+	-->
 	<listener>
   		<listener-class>org.kasource.web.websocket.guice.example.web.ExampleServletConfig</listener-class>
 	</listener>
@@ -30,5 +31,4 @@
     <url-pattern>/chat</url-pattern>
   </servlet-mapping>
 
-    
 </web-app>

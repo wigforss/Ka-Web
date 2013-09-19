@@ -6,7 +6,7 @@
     version="3.0"
 >
 	<display-name>Ka Web Socket GlassFish / CDI Example</display-name>
-	
+	<!--    
 	<context-param>
 		<param-name>webSocketConfigLocation</param-name>
 		<param-value>/WEB-INF/websocket-config.xml</param-value>
@@ -14,11 +14,12 @@
 	<listener>
 		<listener-class>org.kasource.web.websocket.bootstrap.WebSocketConfigListener</listener-class>
 	</listener>
+	-->
 	<servlet>
         <description>WebSocketsServlet</description>
         <servlet-name>chat</servlet-name>
         <servlet-class>org.kasource.web.websocket.impl.glassfish.GlassFishWebSocketImpl</servlet-class>
-        <load-on-startup>1</load-on-startup>
+        <load-on-startup>2</load-on-startup>
     </servlet>
     <servlet-mapping>
         <servlet-name>chat</servlet-name>

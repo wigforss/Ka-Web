@@ -3,9 +3,12 @@ package org.kasource.web.websocket.cdi.event;
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.enterprise.util.AnnotationLiteral;
+
+import javax.inject.Named;
 import javax.inject.Qualifier;
+
+import org.kasource.web.websocket.cdi.util.AnnotationUtil;
 
 /**
  * Configures which annotation is mapped to what context path. 
@@ -33,22 +36,14 @@ public class CdiWebSocketMapping implements AnnotationWebsocketBinding {
         
         public Builder map(String socketName, Class<? extends Annotation> annotationClass) {
             if(annotationClass.isAnnotationPresent(Qualifier.class)) {
-                mapping.put(socketName, getAnnotation(annotationClass));
+                mapping.put(socketName, AnnotationUtil.getAnnotation(annotationClass));
                 return this;
             } else {
                 throw new IllegalArgumentException(annotationClass + " must be annotated with @"+Qualifier.class);
             }
         }
         
-        @SuppressWarnings({ "unchecked", "serial" })
-        private <T extends Annotation> T getAnnotation(final Class<T> annoClass) {
-            return (T) new AnnotationLiteral<T>() {
-                @Override
-                public Class<? extends Annotation> annotationType() {
-                    return annoClass;
-                }
-            };
-        }
+       
         
         public CdiWebSocketMapping build() {
             return new CdiWebSocketMapping(this);

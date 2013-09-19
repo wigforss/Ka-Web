@@ -2,10 +2,13 @@ package org.kasource.web.websocket.spring.config;
 
 import org.kasource.web.websocket.channel.WebSocketChannelFactory;
 import org.kasource.web.websocket.client.id.ClientIdGenerator;
+import org.kasource.web.websocket.config.OriginWhiteListConfig;
 import org.kasource.web.websocket.config.WebSocketConfig;
+import org.kasource.web.websocket.config.WebSocketConfigImpl;
 import org.kasource.web.websocket.config.WebSocketServletConfigImpl;
 import org.kasource.web.websocket.manager.WebSocketManagerRepository;
 import org.kasource.web.websocket.protocol.ProtocolHandlerRepository;
+import org.kasource.web.websocket.register.WebSocketListenerRegister;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Required;
@@ -21,6 +24,7 @@ public class SpringWebSocketConfigFactoryBean  implements FactoryBean<WebSocketC
     
     private WebSocketChannelFactory channelFactory;
   
+    private WebSocketListenerRegister listenerRegister;
     
     private ApplicationContext applicationContext;
     
@@ -40,15 +44,15 @@ public class SpringWebSocketConfigFactoryBean  implements FactoryBean<WebSocketC
         
        
         
-        SpringWebSocketConfig config = new SpringWebSocketConfig();
+        WebSocketConfigImpl config = new WebSocketConfigImpl();
      
         config.setClientIdGenerator(clientIdGenerator);
-        
+        config.setListenerRegister(listenerRegister);
         config.setChannelFactory(channelFactory);
         config.setManagerRepository(managerRepository);
         config.setProtocolHandlerRepository(protocolHandlerRepository);
         if(originList != null && originList.getOriginWhiteList() != null) {
-            config.setOrginWhitelist(originList.getOriginWhiteList());
+            config.setOriginWhitelist(originList.getOriginWhiteList());
         }
         registerServlets(config);
        
@@ -56,7 +60,7 @@ public class SpringWebSocketConfigFactoryBean  implements FactoryBean<WebSocketC
     }
 
     
-    private void registerServlets(SpringWebSocketConfig config) {
+    private void registerServlets(WebSocketConfigImpl config) {
       
         String[] beans = applicationContext.getBeanNamesForType(WebSocketServletConfigImpl.class);
         for(String beanName : beans) {
@@ -72,7 +76,7 @@ public class SpringWebSocketConfigFactoryBean  implements FactoryBean<WebSocketC
     @Override
     public Class<?> getObjectType() {
        
-        return SpringWebSocketConfig.class;
+        return WebSocketConfigImpl.class;
     }
 
     @Override
@@ -120,6 +124,14 @@ public class SpringWebSocketConfigFactoryBean  implements FactoryBean<WebSocketC
      */
     public void setClientIdGenerator(ClientIdGenerator clientIdGenerator) {
         this.clientIdGenerator = clientIdGenerator;
+    }
+
+
+    /**
+     * @param listenerRegister the listenerRegister to set
+     */
+    public void setListenerRegister(WebSocketListenerRegister listenerRegister) {
+        this.listenerRegister = listenerRegister;
     }
 
 }

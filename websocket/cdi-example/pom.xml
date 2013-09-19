@@ -24,7 +24,7 @@
 			<plugin>
     			<groupId>org.glassfish.embedded</groupId>
 				<artifactId>maven-embedded-glassfish-plugin</artifactId>
-				<version>3.1.2</version>
+				<version>3.1.2.2</version>
     			<configuration>
        				<goalPrefix>embedded-glassfish</goalPrefix>
        				<app>target/ka-cdi-websocket-example-${project.version}</app>
@@ -32,7 +32,9 @@
        				<port>8080</port>
        				<contextRoot>/chat-example</contextRoot>
        				<glassfishProperties>
-       					configs.config.server-config.network-config.protocols.protocol.http-listener-1.http.websockets-support-enabled=true
+       					<property>
+       						configs.config.server-config.network-config.protocols.protocol.http-listener-1.http.websockets-support-enabled=true
+       					</property>
        				</glassfishProperties>
     			</configuration> 
     		</plugin>

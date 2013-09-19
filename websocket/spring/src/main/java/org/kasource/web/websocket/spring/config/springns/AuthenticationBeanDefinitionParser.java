@@ -3,7 +3,7 @@ package org.kasource.web.websocket.spring.config.springns;
 
 import java.util.List;
 
-import org.kasource.web.websocket.spring.config.AuthenticationConfig;
+import org.kasource.web.websocket.config.AuthenticationConfig;
 import org.kasource.web.websocket.spring.config.KaWebSocketBean;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.PropertyValue;

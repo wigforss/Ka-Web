@@ -4,30 +4,25 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.enterprise.event.Observes;
+import javax.enterprise.inject.spi.AfterDeploymentValidation;
 import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.ProcessInjectionTarget;
-import javax.servlet.ServletContext;
 
+import org.kasource.web.websocket.config.WebSocketConfig;
+import org.kasource.web.websocket.config.WebSocketServletConfigImpl;
 import org.kasource.web.websocket.register.WebSocketListenerRegister;
-import org.kasource.web.websocket.register.WebSocketListenerRegisterImpl;
 
 
 /**
- * Can observe
+ * Add beans as listeners automatically.
  * 
- * BeforeBeanDiscovery
- * ProcessAnnotatedType
- * ProcessInjectionTarget and ProcessProducer
- * ProcessBean and ProcessObserverMethod 
- * AfterBeanDiscovery
- * AfterDeploymentValidation
  *  
  * @author rikardwi
  **/
 public class WebSocketEventExtension implements Extension {
     
     private Set<Object> listenerCandidates = new HashSet<Object>();
-    
+    private Set<WebSocketServletConfigImpl> servletConfigs = new HashSet<WebSocketServletConfigImpl>();
     
     /**
      * Handle all injections
@@ -36,24 +31,29 @@ public class WebSocketEventExtension implements Extension {
      **/
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public void processInjectorTarger(@Observes ProcessInjectionTarget<Object> pit) {
-         pit.setInjectionTarget(new RegisterWebSocketEventListenerInjectionTarget(pit.getInjectionTarget(), listenerCandidates));         
+         pit.setInjectionTarget(new RegisterWebSocketEventListenerInjectionTarget(pit.getInjectionTarget(), listenerCandidates, servletConfigs));         
        
     }
 
     
-   
-
     /**
-     * Invoked when a initialized ServletContext has been published.
-     * 
-     * @param servletContext ServletContext to use.
-     **/
-    public void onServletContextInitialized(@Observes ServletContext servletContext) {
-        WebSocketListenerRegister listenerRegister = new WebSocketListenerRegisterImpl(servletContext);
-        for(Object listenerCandidate : listenerCandidates) {
-            listenerRegister.registerListener(listenerCandidate);
-        }
-    }
+    * Eagerly loads the Event Dispatcher.
+    * 
+    * @param event             AfterBeanDiscovery event.
+    * @param eventDispatcher   Event Dispatcher to eagerly load.
+    */
+   void afterAfterDeploymentValidation(@Observes AfterDeploymentValidation event, WebSocketListenerRegister listenerRegister, WebSocketConfig config) {
+       for(Object listenerCandidate : listenerCandidates) {
+           listenerRegister.registerListener(listenerCandidate);
+       }
+       for(WebSocketServletConfigImpl servletConfig : servletConfigs) {
+           if(servletConfig.getServletName() != null) {
+               config.registerServlet(servletConfig);
+           }
+       }
+   }
+
+   
     
 
     

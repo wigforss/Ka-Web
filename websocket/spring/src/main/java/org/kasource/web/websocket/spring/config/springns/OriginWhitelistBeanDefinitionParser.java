@@ -3,8 +3,8 @@ package org.kasource.web.websocket.spring.config.springns;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.kasource.web.websocket.config.OriginWhiteListConfig;
 import org.kasource.web.websocket.spring.config.KaWebSocketBean;
-import org.kasource.web.websocket.spring.config.OriginWhiteListConfig;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;

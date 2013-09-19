@@ -11,7 +11,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.kasource.web.websocket.client.id.ClientIdGenerator;
 import org.kasource.web.websocket.client.id.ClientIdGeneratorImpl;
+import org.kasource.web.websocket.config.AuthenticationConfig;
+import org.kasource.web.websocket.config.OriginWhiteListConfig;
 import org.kasource.web.websocket.config.TextProtocolHandlerConfigImpl;
+import org.kasource.web.websocket.config.WebSocketConfigImpl;
 import org.kasource.web.websocket.config.WebSocketServletConfig;
 import org.kasource.web.websocket.config.WebSocketServletConfigImpl;
 import org.kasource.web.websocket.protocol.JsonProtocolHandler;
@@ -19,9 +22,6 @@ import org.kasource.web.websocket.protocol.ProtocolHandler;
 import org.kasource.web.websocket.protocol.TextProtocolHandler;
 import org.kasource.web.websocket.security.AuthenticationProvider;
 import org.kasource.web.websocket.security.PassthroughAutenticationProvider;
-import org.kasource.web.websocket.spring.config.AuthenticationConfig;
-import org.kasource.web.websocket.spring.config.OriginWhiteListConfig;
-import org.kasource.web.websocket.spring.config.SpringWebSocketConfig;
 import org.kasource.web.websocket.spring.config.configuration.SpringKaWebSocket;
 
 
@@ -77,7 +77,7 @@ public class ExampleConfiguration {
     
     @Autowired
     @Bean(name = "chatConfig")
-    public WebSocketServletConfig getChatWebSocketServletConfig(WebSocketServletConfigImpl prototypeConfig, SpringWebSocketConfig config) {
+    public WebSocketServletConfig getChatWebSocketServletConfig(WebSocketServletConfigImpl prototypeConfig, WebSocketConfigImpl config) {
         prototypeConfig.setDynamicAddressing(true);
         prototypeConfig.setServletName("chat");
         config.registerServlet(prototypeConfig);

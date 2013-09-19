@@ -38,7 +38,7 @@
 		</entry>
 	</util:map>
 	
-	<bean id="authConfig" class="org.kasource.web.websocket.spring.config.AuthenticationConfig">
+	<bean id="authConfig" class="org.kasource.web.websocket.config.AuthenticationConfig">
 		<!--  
 		<property name="defaultAuthenticationProvider">
 			<bean class="org.kasource.web.websocket.security.PassthroughAutenticationProvider"/>

@@ -30,7 +30,9 @@ public class WebSocketConfigListener implements ServletContextListener, ServletC
      **/
     @Override
     public void attributeAdded(ServletContextAttributeEvent attributeEvent) {
-        factory.addWebSocketManagerFromAttribute(attributeEvent.getName(), attributeEvent.getValue());
+        if(factory != null) {
+            factory.addWebSocketManagerFromAttribute(attributeEvent.getName(), attributeEvent.getValue());
+        }
     }
 
     @Override

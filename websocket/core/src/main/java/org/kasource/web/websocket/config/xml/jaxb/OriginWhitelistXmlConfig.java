@@ -39,13 +39,13 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "orgin"
+    "origin"
 })
-@XmlRootElement(name = "orginWhitelist")
-public class OrginWhitelistXmlConfig {
+@XmlRootElement(name = "originWhitelist")
+public class OriginWhitelistXmlConfig {
 
     @XmlElement(required = true)
-    protected List<String> orgin;
+    protected List<String> origin;
 
     /**
      * Gets the value of the orgin property.
@@ -69,11 +69,11 @@ public class OrginWhitelistXmlConfig {
      * 
      * 
      */
-    public List<String> getOrgin() {
-        if (orgin == null) {
-            orgin = new ArrayList<String>();
+    public List<String> getOrigin() {
+        if (origin == null) {
+            origin = new ArrayList<String>();
         }
-        return this.orgin;
+        return this.origin;
     }
 
 }

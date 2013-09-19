@@ -14,6 +14,7 @@ import org.kasource.web.websocket.config.ProtocolHandlerConfig;
 import org.kasource.web.websocket.config.WebSocketConfig;
 import org.kasource.web.websocket.config.WebSocketConfigException;
 import org.kasource.web.websocket.config.WebSocketServletConfig;
+import org.kasource.web.websocket.config.WebSocketServletConfigImpl;
 import org.kasource.web.websocket.config.xml.jaxb.WebsocketXml;
 import org.kasource.web.websocket.config.xml.jaxb.WebsocketXmlConfigRoot;
 import org.kasource.web.websocket.manager.WebSocketManagerRepository;
@@ -55,7 +56,7 @@ public class XmlWebSocketConfig implements WebSocketConfig {
         
         
         if(config.getOrginWhitelist() != null) {
-            originWhitelist.addAll(config.getOrginWhitelist().getOrgin());
+            originWhitelist.addAll(config.getOrginWhitelist().getOrigin());
         }
         managerRepository = new WebSocketManagerRepositoryImpl(servletContext);
         if(authentication != null) {
@@ -107,7 +108,7 @@ public class XmlWebSocketConfig implements WebSocketConfig {
     }
     
     @Override
-    public Set<String> getOrginWhitelist() {
+    public Set<String> getOriginWhitelist() {
         
         return originWhitelist;
     }
@@ -133,6 +134,13 @@ public class XmlWebSocketConfig implements WebSocketConfig {
     @Override
     public WebSocketListenerRegister getListenerRegister() {
         return listenerRegister;
+    }
+
+
+
+    @Override
+    public void registerServlet(WebSocketServletConfigImpl servlet) {
+        
     }
 
 }

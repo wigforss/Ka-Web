@@ -21,7 +21,7 @@
     
     
     
-<!--      
+      
 	<context-param>
 		<param-name>webSocketConfigLocation</param-name>
 		<param-value>/WEB-INF/websocket-config.xml</param-value>
@@ -29,7 +29,7 @@
 	<listener>
 		<listener-class>org.kasource.web.websocket.bootstrap.WebSocketConfigListener</listener-class>
 	</listener>
--->
+<!-- 
 	<servlet>
         <servlet-name>chatServer</servlet-name>
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
@@ -41,12 +41,15 @@
         <url-pattern>/chatServer/*</url-pattern>
     </servlet-mapping>
 
-  
- 
+   -->
+ <servlet>
+        <servlet-name>chatServer</servlet-name>
+        <servlet-class>org.kasource.web.websocket.spring.example.ChatServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
  
   <servlet>
     <servlet-name>chat</servlet-name>
-    <!-- <servlet-class>org.kasource.web.websocket.impl.jetty.JettyWebSocketImpl</servlet-class> -->
     <servlet-class>org.kasource.web.websocket.impl.tomcat.TomcatWebsocketImpl</servlet-class>
     <load-on-startup>2</load-on-startup>
   </servlet>

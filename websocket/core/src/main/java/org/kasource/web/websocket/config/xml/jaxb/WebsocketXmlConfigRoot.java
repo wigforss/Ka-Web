@@ -62,7 +62,7 @@ public class WebsocketXmlConfigRoot  {
 
     @XmlElement(required = true)
     protected List<WebsocketXml> websocket;
-    protected OrginWhitelistXmlConfig orginWhitelist;
+    protected OriginWhitelistXmlConfig orginWhitelist;
     protected ClientIdGeneratorXmlConfig clientIdGenerator;
     protected AuthenticationXmlConfig authentication;
     protected ProtocolHandlerXmlConfig textProtocolHandler;
@@ -102,10 +102,10 @@ public class WebsocketXmlConfigRoot  {
      * 
      * @return
      *     possible object is
-     *     {@link OrginWhitelistXmlConfig }
+     *     {@link OriginWhitelistXmlConfig }
      *     
      */
-    public OrginWhitelistXmlConfig getOrginWhitelist() {
+    public OriginWhitelistXmlConfig getOrginWhitelist() {
         return orginWhitelist;
     }
 
@@ -114,10 +114,10 @@ public class WebsocketXmlConfigRoot  {
      * 
      * @param value
      *     allowed object is
-     *     {@link OrginWhitelistXmlConfig }
+     *     {@link OriginWhitelistXmlConfig }
      *     
      */
-    public void setOrginWhitelist(OrginWhitelistXmlConfig value) {
+    public void setOrginWhitelist(OriginWhitelistXmlConfig value) {
         this.orginWhitelist = value;
     }
 

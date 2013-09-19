@@ -3,24 +3,23 @@ package org.kasource.web.websocket.guice.channel;
 import javax.inject.Inject;
 import javax.servlet.ServletContext;
 
-import org.kasource.web.websocket.channel.WebSocketChannel;
-import org.kasource.web.websocket.channel.WebSocketChannelFactory;
 import org.kasource.web.websocket.channel.WebSocketChannelFactoryImpl;
 import org.kasource.web.websocket.config.WebSocketConfigException;
-import org.kasource.web.websocket.listener.WebSocketEventListener;
+
+import com.google.inject.Injector;
+import com.google.inject.Singleton;
 
 /**
  * Guice injectable WebSocketChannelFactory.
  * 
  * @author rikardwi
  **/
+@Singleton
 public class GuiceWebSocketChannelFactory extends WebSocketChannelFactoryImpl {
-
-   
-  
     
     @Inject
-    public GuiceWebSocketChannelFactory(ServletContext servletContext) {
+    public GuiceWebSocketChannelFactory(Injector injector) {
+        this.servletContext = injector.getInstance(ServletContext.class);
        try {
            initialize(servletContext);
        } catch (Exception e) {

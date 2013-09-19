@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.kasource.web.websocket.channel.WebSocketChannelFactory;
+import org.kasource.web.websocket.client.id.ClientIdGenerator;
+import org.kasource.web.websocket.client.id.DefaultClientIdGenerator;
 
 import org.kasource.web.websocket.manager.WebSocketManagerRepository;
 import org.kasource.web.websocket.protocol.ProtocolHandlerRepository;
@@ -15,7 +17,7 @@ import org.kasource.web.websocket.register.WebSocketListenerRegister;
 public class WebSocketConfigImpl implements WebSocketConfig {
    
     
-    private Set<String> orginWhitelist = new HashSet<String>();
+    private Set<String> originWhitelist = new HashSet<String>();
     
     private ProtocolHandlerRepository protocolHandlerRepository;
     
@@ -27,19 +29,39 @@ public class WebSocketConfigImpl implements WebSocketConfig {
    
     private WebSocketListenerRegister listenerRegister;
     
+    private ClientIdGenerator clientIdGenerator;
+    
+    public void registerServlet(WebSocketServletConfigImpl servlet) {
+       
+        if(getOriginWhitelist() != null) {
+            servlet.setOriginWhitelist(getOriginWhitelist());
+        } 
+        if(servlet.getClientIdGenerator() == null) {
+            servlet.setClientIdGenerator(clientIdGenerator != null ? clientIdGenerator : new DefaultClientIdGenerator());
+        }
+        getServletConfigs().put(servlet.getServletName(), servlet);
+    }
+
+    /**
+     * @param clientIdGenerator the clientIdGenerator to set
+     */
+    public void setClientIdGenerator(ClientIdGenerator clientIdGenerator) {
+        this.clientIdGenerator = clientIdGenerator;
+    }
+    
     /**
      * @return the orginWhitelist
      */
     @Override
-    public Set<String> getOrginWhitelist() {
-        return orginWhitelist;
+    public Set<String> getOriginWhitelist(){
+        return originWhitelist;
     }
 
     /**
      * @param orginWhitelist the orginWhitelist to set
      */
-    public void setOrginWhitelist(Set<String> orginWhitelist) {
-        this.orginWhitelist = orginWhitelist;
+    public void setOriginWhitelist(Set<String> orginWhitelist) {
+        this.originWhitelist = orginWhitelist;
     }
 
     
@@ -128,6 +150,13 @@ public class WebSocketConfigImpl implements WebSocketConfig {
      */
     public void setListenerRegister(WebSocketListenerRegister listenerRegister) {
         this.listenerRegister = listenerRegister;
+    }
+
+    /**
+     * @return the clientIdGenerator
+     */
+    protected ClientIdGenerator getClientIdGenerator() {
+        return clientIdGenerator;
     }
 
     

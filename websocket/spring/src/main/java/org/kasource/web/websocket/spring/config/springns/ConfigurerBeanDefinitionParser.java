@@ -39,6 +39,7 @@ public class ConfigurerBeanDefinitionParser extends AbstractSingleBeanDefinition
     protected void doParse(Element element, ParserContext pc,
             BeanDefinitionBuilder bean) {
         element.setAttribute(ID_ATTRIBUTE, KaWebSocketBean.CONFIGURER_ID);
+        element.setAttribute(NAME_ATTRIBUTE, KaWebSocketBean.CONFIGURER_ID);
         bean.addPropertyReference("channelFactory", KaWebSocketBean.CHANNEL_FACTORY_ID);
         bean.setInitMethodName("configure");
         bean.addConstructorArgReference(KaWebSocketBean.CONFIG_ID);
@@ -104,7 +105,9 @@ public class ConfigurerBeanDefinitionParser extends AbstractSingleBeanDefinition
        
         if(element.getAttribute("clientIdGeneratorRef") != null) {
              String ref = element.getAttribute("clientIdGeneratorRef");
-             builder.addPropertyReference("clientIdGenerator", ref);
+             if(ref != null && !ref.trim().isEmpty()) {
+                 builder.addPropertyReference("clientIdGenerator", ref);
+             }
         }
             
         

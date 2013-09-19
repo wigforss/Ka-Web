@@ -6,6 +6,7 @@ import javax.servlet.ServletContext;
 
 import org.kasource.web.websocket.channel.WebSocketChannelFactory;
 import org.kasource.web.websocket.client.id.ClientIdGenerator;
+import org.kasource.web.websocket.config.OriginWhiteListConfig;
 import org.kasource.web.websocket.config.WebSocketConfig;
 import org.kasource.web.websocket.config.WebSocketServletConfigImpl;
 import org.kasource.web.websocket.manager.WebSocketManagerRepository;
@@ -13,7 +14,6 @@ import org.kasource.web.websocket.protocol.ProtocolHandlerRepository;
 import org.kasource.web.websocket.register.WebSocketListenerRegister;
 import org.kasource.web.websocket.spring.channel.SpringWebSocketChannelFactory;
 import org.kasource.web.websocket.spring.config.KaWebSocketBean;
-import org.kasource.web.websocket.spring.config.OriginWhiteListConfig;
 import org.kasource.web.websocket.spring.config.SpringWebSocketConfigFactoryBean;
 import org.kasource.web.websocket.spring.config.SpringWebSocketConfigurer;
 import org.kasource.web.websocket.spring.manager.WebSocketManagerRepositoryFactoryBean;

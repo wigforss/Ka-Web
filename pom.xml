@@ -44,7 +44,7 @@
     <properties>
         <slf4j.version>1.7.3</slf4j.version>
         <junit.version>4.8.1</junit.version>
-        <spring.version>3.2.2.RELEASE</spring.version>
+        <spring.version>[3.0.0.RELEASE,3.2.3.RELEASE]</spring.version>
     </properties>
 
     <modules>
@@ -170,11 +170,6 @@
 			<dependency>
 				<groupId>com.google.inject</groupId>
 				<artifactId>guice</artifactId>
-				<version>3.0</version>
-			</dependency>
-			<dependency>
-				<groupId>com.google.inject.extensions</groupId>
-				<artifactId>guice-servlet</artifactId>
 				<version>3.0</version>
 			</dependency>
 			<dependency>

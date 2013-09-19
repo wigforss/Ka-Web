@@ -1,6 +1,6 @@
 package org.kasource.web.websocket.guice.example.web;
 
-import org.kasource.web.websocket.guice.KaWebSocketModule;
+
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -11,15 +11,12 @@ public class ExampleServletConfig extends GuiceServletContextListener {
 
     @Override
     protected Injector getInjector() {
-        // Create Injector
-        Injector injector = Guice.createInjector(new ServletModule(), new KaWebSocketModule());
-        
+        Injector injector = Guice.createInjector(new ServletModule(), new ExampleModule());
+      
         injector.getInstance(ChatServer.class);
         return injector;
 
     }
     
     
-
-
 }

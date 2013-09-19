@@ -1,4 +1,4 @@
-package org.kasource.web.websocket.spring.config;
+package org.kasource.web.websocket.config;
 
 import java.util.HashMap;
 import java.util.Map;

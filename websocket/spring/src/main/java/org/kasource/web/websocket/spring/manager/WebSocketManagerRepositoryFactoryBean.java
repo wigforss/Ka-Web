@@ -4,10 +4,10 @@ package org.kasource.web.websocket.spring.manager;
 
 import javax.servlet.ServletContext;
 
+import org.kasource.web.websocket.config.AuthenticationConfig;
 import org.kasource.web.websocket.manager.WebSocketManagerRepository;
 import org.kasource.web.websocket.manager.WebSocketManagerRepositoryImpl;
 import org.kasource.web.websocket.protocol.ProtocolHandlerRepository;
-import org.kasource.web.websocket.spring.config.AuthenticationConfig;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.context.ApplicationContext;

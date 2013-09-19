@@ -52,11 +52,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link OrginWhitelistXmlConfig }
+     * Create an instance of {@link OriginWhitelistXmlConfig }
      * 
      */
-    public OrginWhitelistXmlConfig createOrginWhitelist() {
-        return new OrginWhitelistXmlConfig();
+    public OriginWhitelistXmlConfig createOrginWhitelist() {
+        return new OriginWhitelistXmlConfig();
     }
 
     /**

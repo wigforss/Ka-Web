@@ -6,16 +6,19 @@ import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.enterprise.inject.spi.InjectionTarget;
 
+import org.kasource.web.websocket.config.WebSocketServletConfigImpl;
+
 
 public  class RegisterWebSocketEventListenerInjectionTarget<T> implements InjectionTarget<T> {
    private Set<Object> listenerCandidates;
-   
+   private Set<WebSocketServletConfigImpl> servletConfigs;
    private InjectionTarget<T> injectionTarget;
 
    
-    public RegisterWebSocketEventListenerInjectionTarget(InjectionTarget<T> injectionTarget, Set<Object> listenerCandidates) {
+    public RegisterWebSocketEventListenerInjectionTarget(InjectionTarget<T> injectionTarget, Set<Object> listenerCandidates, Set<WebSocketServletConfigImpl> servletConfigs) {
         this.injectionTarget = injectionTarget;
         this.listenerCandidates = listenerCandidates;
+        this.servletConfigs = servletConfigs;
     }
 
 
@@ -46,7 +49,11 @@ public  class RegisterWebSocketEventListenerInjectionTarget<T> implements Inject
     @Override
     public void postConstruct(T instance) {
         injectionTarget.postConstruct(instance);
-        listenerCandidates.add(instance);       
+        if(instance instanceof WebSocketServletConfigImpl) {
+            servletConfigs.add((WebSocketServletConfigImpl) instance);
+        } else {
+            listenerCandidates.add(instance);
+        }
     }
 
     @Override
