@@ -71,7 +71,11 @@
     <build>
         <pluginManagement>
             <plugins>
-
+				 <plugin>
+       				 <groupId>org.apache.maven.plugins</groupId>
+        			<artifactId>maven-release-plugin</artifactId>
+        			<version>2.4.1</version>
+      			</plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
@@ -97,6 +101,11 @@
     </reporting>
     <dependencyManagement>
         <dependencies>
+        	<dependency>
+    			<groupId>org.kasource.commons</groupId>
+				<artifactId>ka-commons</artifactId>
+				<version>1.0</version>
+    		</dependency>
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
