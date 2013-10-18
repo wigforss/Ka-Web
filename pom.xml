@@ -9,7 +9,7 @@
     <artifactId>ka-web</artifactId>
     <version>0.4-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>Ka Web</name>
+    <name>Ka Web Base</name>
     <description>Ka Web base project</description>
     <url>http://maven.apache.org</url>
     <licenses>
@@ -44,30 +44,13 @@
     <properties>
         <slf4j.version>1.7.3</slf4j.version>
         <junit.version>4.8.1</junit.version>
-        <spring.version>[3.0.0.RELEASE,3.2.3.RELEASE]</spring.version>
     </properties>
 
     <modules>
         <module>servlet</module>
-        <module>websocket</module>
-      
     </modules>
 
-    <repositories>
-        <repository>
-            <id>release-repository.java.net</id>
-            <name>Java.net Release Repository for Maven</name>
-            <url>https://maven.java.net/content/repositories/releases/</url>
-            <layout>default</layout>
-        </repository>
-        <repository>
-            <id>release-repository.caucho.com</id>
-            <name>caucho.com Release Repository for Maven</name>
-            <url>http://caucho.com/m2/</url>
-            <layout>default</layout>
-        </repository>
-
-    </repositories>
+    
     <build>
         <pluginManagement>
             <plugins>
@@ -116,124 +99,14 @@
 				<groupId>org.slf4j</groupId>
 				<artifactId>slf4j-api</artifactId>
 				<version>${slf4j.version}</version>
-			</dependency>
-			<dependency>
-    			<groupId>org.slf4j</groupId>
-    			<artifactId>slf4j-log4j12</artifactId>
-    			<version>${slf4j.version}</version>
-			</dependency> 
-			<dependency>
-				<groupId>org.slf4j</groupId>
-				<artifactId>jul-to-slf4j</artifactId>
-				<version>${slf4j.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.codehaus.jackson</groupId>
-				<artifactId>jackson-mapper-asl</artifactId>
-				<version>1.9.12</version>
-			</dependency>
-			<dependency>
-				<groupId>commons-codec</groupId>
-				<artifactId>commons-codec</artifactId>
-				<version>1.7</version>
-			</dependency>
-			<dependency>
-    			<groupId>log4j</groupId>
-    			<artifactId>log4j</artifactId>
-    			<version>1.2.16</version>
-			</dependency>	
-            <dependency>
-                <groupId>org.apache.tomcat</groupId>
-                <artifactId>tomcat-catalina</artifactId>
-                <version>7.0.30</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.tomcat</groupId>
-                <artifactId>tomcat-coyote</artifactId>
-                <version>7.0.30</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-websocket</artifactId>
-                <version>8.1.6.v20120903</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-				<groupId>com.sun.grizzly</groupId>
-				<artifactId>grizzly-websockets</artifactId>
-				<version>1.9.56</version>
-				<scope>provided</scope>
-			</dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-webmvc</artifactId>
-                <version>${spring.version}</version>
-            </dependency>
-             <dependency>
-				<groupId>com.google.inject.extensions</groupId>
-				<artifactId>guice-servlet</artifactId>
-				<version>3.0</version>
-			</dependency>
-			<dependency>
-				<groupId>com.google.inject</groupId>
-				<artifactId>guice</artifactId>
-				<version>3.0</version>
-			</dependency>
-			<dependency>
-				<groupId>javax</groupId>
-				<artifactId>javaee-api</artifactId>
-				<version>6.0</version>
-			</dependency>
-            <dependency>
-                <groupId>com.caucho</groupId>
-                <artifactId>resin</artifactId>
-                <version>4.0.30</version>
-                <scope>provided</scope>
-            </dependency>
+			</dependency>     
             <dependency>
                 <groupId>javax.servlet</groupId>
                 <artifactId>javax.servlet-api</artifactId>
                 <version>3.0.1</version>
                 <scope>provided</scope>
             </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-core</artifactId>
-                <version>${spring.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-web</artifactId>
-                <version>${spring.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-beans</artifactId>
-                <version>${spring.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-context</artifactId>
-                <version>${spring.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-context-support</artifactId>
-                <version>${spring.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-expression</artifactId>
-                <version>${spring.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.aspectj</groupId>
-                <artifactId>aspectjrt</artifactId>
-                <version>1.6.12</version>
-                <scope>runtime</scope>
-            </dependency>
+         
         </dependencies>
     </dependencyManagement>
 </project>

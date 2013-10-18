@@ -9,7 +9,7 @@
 	<groupId>org.kasource</groupId>
 	<artifactId>ka-servlet</artifactId>
 	<packaging>jar</packaging>
-	<name>Ka Servlet Utils</name>
+	<name>Ka Servlet</name>
 	<description>Ka Servlet utilities and tools</description>
 	<url>http://maven.apache.org</url>
 	
@@ -30,10 +30,7 @@
 			<artifactId>junit</artifactId>
 		</dependency>
 		
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-		</dependency>
+		
 	  <dependency>
        <groupId>javax.servlet</groupId>
         <artifactId>javax.servlet-api</artifactId>
