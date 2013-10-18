@@ -1,0 +1,45 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://kasource.org/schema/ka-web/listener/properties" 
+	xmlns="http://kasource.org/schema/ka-web/listener/properties"
+	elementFormDefault="qualified">
+	
+	<xs:element name="systemProperties">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="property" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="overrideProperties" type="xs:boolean" use="optional" default="false">
+				<xs:annotation>
+					<xs:documentation>
+					 Properties will NOT override what's already defined as system properties unless
+ 					 the overrideProperties attribute is set to true. The default value is false.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="file" type="xs:string" use="optional">
+				<xs:annotation>
+					<xs:documentation>
+					 Reads the property file referred by the file attribute and populates all properties found into
+ 					 system properties. This attribute may contain ${variable}, which matches system properties already defined
+ 					 or environment variables.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="ignoreMissingFile" type="xs:boolean" use="optional" default="false">
+				<xs:annotation>
+					<xs:documentation>
+						Missing file will cause an exception to be thrown unless ignoreMissingFile
+ 						attribute is set to true. The default value is false.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="property">
+		<xs:complexType>
+			<xs:attribute name="name" type="xs:string" use="required"/>
+			<xs:attribute name="value" type="xs:string" use="required"/>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>
