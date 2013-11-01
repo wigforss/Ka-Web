@@ -7,7 +7,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.kasource</groupId>
     <artifactId>ka-web</artifactId>
-    <version>0.4-SNAPSHOT</version>
+    <version>0.4</version>
     <packaging>pom</packaging>
     <name>Ka Web Base</name>
     <description>Ka Web base project</description>
@@ -24,7 +24,8 @@
     	<connection>scm:git:git@github.com:wigforss/Ka-Web.git</connection>
     	<developerConnection>scm:git:git@github.com:wigforss/Ka-Web.git</developerConnection>
     	<url>git@github.com:wigforss/Ka-Web.git</url>
-  	</scm>
+  	  <tag>ka-web-0.4</tag>
+  </scm>
   	
   	
   	
